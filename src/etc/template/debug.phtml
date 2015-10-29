@@ -1,0 +1,31 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Internal Server Error</title>
+    <link rel="stylesheet" type="text/css" href="<?php echo $webDir ?>/Neat/css/neat.css">
+    <script src="<?php echo $webDir ?>/Neat/js/neat.js"></script>
+</head>
+<body>
+
+<div class="neat-box">
+    <div class="title">Name</div>
+    <div class="content"><?php echo $name ?></div>
+</div>
+
+<div class="neat-box">
+    <div class="title">Message</div>
+    <div class="content"><?php echo $message ?></div>
+</div>
+
+<div class="neat-box">
+    <div class="title">Debug</div>
+    <div class="content"><pre><?php echo $debug ?></pre></div>
+</div>
+
+<div class="neat-box">
+    <div class="title">Backtrace</div>
+    <div class="content"><?php echo $backtrace ?></div>
+</div>
+
+</body>
+</html>

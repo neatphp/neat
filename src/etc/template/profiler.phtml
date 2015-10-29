@@ -1,0 +1,29 @@
+<div class="neat-profiler">
+
+    <ul id="neat-profiler-tabs" class="neat-tabs neat-clearfix">
+        <li class="tab left"><a href="#Neat-Profiler-Debug">Debug</a></li>
+        <li class="tab left"><a href="#Neat-Profiler-Backtrace">Backtrace</a></li>
+        <?php foreach ($this->tabs as $tab): ?>
+        <li class="tab left"><a href="#<?php echo $tab->getId() ?>"><?php echo $tab->getName() ?></a></li>
+        <?php endforeach ?>
+        <li class="tab right"><a href="#close">X</a></li>
+        <li class="tab right"><a href="#hide">_</a></li>
+    </ul>
+
+    <ul class="neat-tab-contents">
+        <li class="content" id="Neat-Profiler-Debug">
+            <?php echo $this->dumper->formatDebugRecords($this->debugRecords); ?>
+        </li>
+        <li class="content" id="Neat-Profiler-Backtrace">
+            <?php echo $this->dumper->formatBacktrace(debug_backtrace()); ?>
+        </li>
+        <?php foreach ($this->tabs as $tab): ?>
+        <li class="content" id="<?php echo $tab->getId() ?>">
+            <?php echo $tab->getContent() ?>
+        </li>
+        <?php endforeach ?>
+    </ul>
+
+<script type="text/javascript">neat.tabs.init("neat-profiler-tabs", "<?php echo $this->getActiveTabId() ?>");</script>
+
+</div>

@@ -1,0 +1,274 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.neat-clearfix {
+	zoom: 1;
+}
+
+.neat-clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+div.neat-box {
+	margin: 1px;
+}
+
+div.neat-box div.title {
+	padding: 5px 10px;
+	background-color: #6f8992;
+	border: 1px solid #6f8992;
+	color: #ffffff;
+	font-weight: bold;
+}
+
+div.neat-box div.content {
+	padding: 10px;
+	background-color: #fafafa;
+	border: 1px solid #d6d6d6;
+	border-top: 0;
+}
+
+ul.neat-tabs {
+	margin: 1px;
+	padding: 5px 10px;
+	background-color: #6f8992;
+	font-weight: bold;
+	list-style-type: none;
+}
+
+ul.neat-tabs li.tab {
+	color: #d6d6d6;
+}
+
+ul.neat-tabs li.left {
+	float: left;
+}
+
+ul.neat-tabs li.right {
+	float: right;
+}
+
+ul.neat-tabs li.tab a {
+	margin: 0 5px;
+	color: #d6d6d6;
+	text-decoration: none;
+}
+
+ul.neat-tabs li.tab a:hover {
+	color: #fafafa;
+}
+
+ul.neat-tabs li.tab a.active {
+	color: #fafafa;
+}
+
+ul.neat-tab-contents {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+ul.neat-tab-contents li.content {
+	display: none;
+	margin: 0 1px;
+	padding: 15px;
+	background-color: #fafafa;
+	border: 1px solid #d6d6d6;
+	border-top: 0;
+}
+
+ul.neat-tab-contents li.active {
+	display: block;
+	height: auto;
+}
+
+table.neat-table {
+	border-collapse: collapse;
+	border: 1px solid #a9a9a9;
+}
+
+table.neat-table thead {
+	background-color: #a9a9a9;
+	font-weight: bold;
+	text-align: left;
+}
+
+table.neat-table tr.even {
+	background-color: #ffffff;
+}
+
+table.neat-table tr.odd {
+	background-color: #eeeeee;
+}
+
+table.neat-table th, td {
+	padding: 2px 5px;
+}
+
+table.neat-table th.line, td.line {
+	border:1px solid #a9a9a9;
+}
+
+div.neat-profiler {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 10000;
+	width: 100%;
+}
+
+ul.neat-widget-accordion {
+	margin: 0;
+	padding: 0;
+}
+
+ul.neat-widget-accordion li {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	overflow: hidden;
+}
+
+ul.neat-widget-accordion ul {
+	margin-left: 10px;
+}
+
+ul.neat-widget-accordion div.name {
+	padding: 5px 0 5px 20px;
+}
+
+ul.neat-widget-accordion div.content {
+    padding: 5px 0 0 20px;
+	overflow: auto;
+}
+
+ul.neat-widget-accordion div.closed {
+    background-image: url(../img/accordion_closed.gif);
+    background-repeat: no-repeat;
+    background-position: 5px;
+    cursor: pointer;
+}
+
+ul.neat-widget-accordion div.opened {
+	background-image: url(../img/accordion_opened.gif);
+	cursor: pointer;
+}
+
+div.neat-widget-bar {
+	border-style: solid;
+	border-width: 1px;
+}
+
+div.neat-widget-bar div.left {
+	float: left;
+	padding: 5px 10px;
+}
+
+div.neat-widget-bar div.right {
+	float: right;
+	padding: 5px 10px;
+}
+
+div.neat-widget-box {
+	border-style: solid;
+	border-width: 1px;
+}
+
+div.neat-widget-box {
+    border-style: solid;
+    border-width: 1px;
+}
+
+div.neat-widget-box div.center {
+	padding: 5px 10px;
+}
+
+div.neat-widget-dialog {
+	position: absolute;
+	top: 30%;
+	left: 30%;
+	border-style: solid;
+	border-width: 1px;
+	z-index: 9999;
+}
+
+div.neat-widget-dialog div.center {
+	padding: 5px 10px;
+}
+
+div.neat-widget-prompt {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    border-style: solid;
+    border-width: 1px;
+    z-index: 9999;
+}
+
+div.neat-widget-prompt div.center {
+    padding: 5px 10px;
+}
+
+div.neat-widget-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000000;
+	filter: alpha(opacity = 50); /* IE */
+	-moz-opacity: 0.5; /* Moz + FF */
+	opacity: 0.5;
+	z-index: 9999;
+}
+
+ul.neat-widget-tabs {
+	margin: 0;
+	padding: 3px 10px;
+	font: bold 11px verdana, arial, sans-serif;
+	list-style-type: none;
+	border-bottom: 1px solid #ccc;
+}
+
+ul.neat-widget-tabs li {
+	display: inline;
+}
+
+ul.neat-widget-tabs li a {
+	margin: 0;
+	padding: 3px 5px;
+	background-color: #eee;
+	text-decoration: none;
+	border: 1px solid #ccc;
+	border-bottom: none;
+}
+
+ul.neat-widget-tabs a:hover {
+	background: #fff;
+}
+
+ul.neat-widget-tabs li a.active {
+	position: relative;
+	top: 1px;
+	padding-top: 4px;
+	background-color: #fff;
+	border-bottom: none;
+}
+
+div.neat-widget-tabs-content {
+	border: 1px solid #ccc;
+	border-top: none;
+	padding: 10px;
+	display: none;
+	background-color: #fff;
+}
+
+div.neat-widget-tabs-content.active {
+	display: block;
+}
