@@ -36,7 +36,7 @@ class Profiler
     }
 
     /**
-     * Returns debug records.
+     * Retrieves debug records.
      *
      * @return array
      */
@@ -46,7 +46,7 @@ class Profiler
     }
 
     /**
-     * Returns the id of active tab.
+     * Retrieves the id of active tab.
      *
      * @return string
      */
@@ -74,6 +74,20 @@ class Profiler
             $record['line'] = $line;
             $this->debugRecords[] = $record;
         }
+
+        return $this;
+    }
+
+    /**
+     * Sets tabs.
+     *
+     * @param Tab\AbstractTab[] $tabs
+     *
+     * @return Profiler
+     */
+    public function setTabs(array $tabs)
+    {
+        foreach ($tabs as $tab) $this->addTab($tab);
 
         return $this;
     }

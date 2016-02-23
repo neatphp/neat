@@ -5,69 +5,151 @@ use Mockery;
 use Mockery\Mock;
 use Neat\Config\Config;
 use Neat\Loader\FileLoader;
+use Neat\Parser\ParserInterface;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var array */
-    private $masterSettings = [
-        'offset1' => 'offset1',
-        'offset2' => null,
-        'path1' => ['path1_segment' => 'path1_segment_value'],
-        'path2' => ['path2_segment' => null],
-    ];
+    /** @var Config */
+    private $subject;
 
-    /** @var array */
-    private $branchSettings1 = [
-        'branch1_offset' => 'branch1_offset_value',
-        'branch1_path' => ['branch1_path_segment' => 'branch1_path_value'],
-    ];
-
-    /** @var array */
-    private $branchSettings2 = [
-        'branch2_offset' => 'branch2_offset_value',
-        'branch2_path' => ['branch2_path_segment' => 'branch2_path_value'],
-    ];
-
-    /**
-     * @test
-     * @return Config
-     */
-    public function loadMasterConfig()
+    protected function setUp()
     {
-        /** @var Mock|FileLoader $fileLoader */
-        $fileLoader = Mockery::mock('Neat\Loader\FileLoader');
-        $fileLoader->shouldReceive('load')->with('config.master', 'config')->once()->andReturn($this->masterSettings);
+        $settings = [
+            'offset1' => '',
+            'offset2' => 'offset2_value',
+            'path1' => [
+                'path1' => [
+                    'path1' => '',
+                ]
+            ],
+            'path2' => [
+                'path2' => [
+                    'path2' => 'path2_value',
+                ]
+            ],
+        ];
 
-        $config = new Config($fileLoader);
-        $config
-            ->loadFile('config.master')
-            ->setBranch('offset2', 'config.branch1')
-            ->setBranch('path2.path2_segment', 'config.branch2');
+        /** @var Mock|FileLoader $mockedFileLoader */
+        $mockedFileLoader = Mockery::mock('Neat\Loader\FileLoader');
+        $mockedFileLoader
+            ->shouldReceive('load')
+            ->with('file.ext', 'config')
+            ->once()
+            ->andReturn('file_content');
 
-        $this->assertSame('offset1', $config->get('offset1'));
-        $this->assertSame('path1_segment_value', $config->get('path1.path1_segment'));
+        /** @var Mock|ParserInterface $mockedParser */
+        $mockedParser = Mockery::mock('Neat\Parser\ParserInterface');
+        $mockedParser
+            ->shouldReceive('parse')
+            ->with('file_content')
+            ->once()
+            ->andReturn($settings);
 
-        return $config;
+        $this->subject = new Config($mockedFileLoader, $mockedParser);
+        $this->subject
+            ->setPlaceholders(['placeholder' => 'placeholder_value'])
+            ->loadFile('file.ext');
     }
 
-    /**
-     * @test
-     * @depends loadMasterConfig
-     * @param Config $config
-     */
-    public function loadBranchConfig(Config $config)
+    public function testLoadFile()
     {
-        /** @var Mock|FileLoader $fileLoader */
-        $fileLoader = $config->getFileLoader();
-        $fileLoader->shouldReceive('load')->with('config.branch1', 'config')->once()->andReturn($this->branchSettings1);
-        $fileLoader->shouldReceive('load')->with('config.branch2', 'config')->once()->andReturn($this->branchSettings2);
+        $settings = [
+            'offset1' => 'offset1_value',
+            'path1' => [
+                'path1' => [
+                    'path1' => 'path1_value',
+                ]
+            ],
+        ];
 
-        $this->assertInstanceOf('Neat\Config\Config', $config->get('offset2'));
-        $this->assertSame('branch1_offset_value', $config->get('offset2.branch1_offset'));
-        $this->assertSame('branch1_path_value', $config->get('offset2.branch1_path.branch1_path_segment'));
+        /** @var Mock|FileLoader $mockedFileLoader */
+        $mockedFileLoader = $this->subject->getFileLoader();
+        $mockedFileLoader
+            ->shouldReceive('load')
+            ->with('file.ext', 'config')
+            ->once()
+            ->andReturn('file_content');
 
-        $this->assertInstanceOf('Neat\Config\Config', $config->get('path2.path2_segment'));
-        $this->assertSame('branch2_offset_value', $config->get('path2.path2_segment.branch2_offset'));
-        $this->assertSame('branch2_path_value', $config->get('path2.path2_segment.branch2_path.branch2_path_segment'));
+        /** @var Mock|ParserInterface $mockedParser */
+        $mockedParser = $this->subject->getParser();
+        $mockedParser
+            ->shouldReceive('parse')
+            ->with('file_content')
+            ->once()
+            ->andReturn($settings);
+
+        $this->subject->loadFile('file.ext');
+
+        $this->assertSame(['{{placeholder}}' => 'placeholder_value'], $this->subject->getPlaceholders());
+        $this->assertSame('offset1_value', $this->subject->get('offset1'));
+        $this->assertSame('path1_value', $this->subject->get('path1.path1.path1'));
+    }
+
+    public function testHas_existingOffset_returnsTrue()
+    {
+        $this->assertTrue($this->subject->has('offset1'));
+        $this->assertTrue($this->subject->has('offset2'));
+    }
+
+    public function testHas_nonExistingOffset_returnsFalse()
+    {
+        $this->assertFalse($this->subject->has('offset'));
+    }
+
+    public function testHas_existingPath_returnsTrue()
+    {
+        $this->assertTrue($this->subject->has('path1.path1'));
+        $this->assertTrue($this->subject->has('path1.path1.path1'));
+        $this->assertTrue($this->subject->has('path2.path2'));
+        $this->assertTrue($this->subject->has('path2.path2.path2'));
+    }
+
+    public function testHas_nonExistingPath_returnsFalse()
+    {
+        $this->assertFalse($this->subject->has('path.path.path'));
+    }
+
+    public function testGet_existingOffset()
+    {
+        $this->assertSame('', $this->subject->get('offset1'));
+        $this->assertSame('offset2_value', $this->subject->get('offset2'));
+    }
+
+    public function testGet_existingPath()
+    {
+        $this->assertSame(['path1' => ''], $this->subject->get('path1.path1'));
+        $this->assertSame('', $this->subject->get('path1.path1.path1'));
+        $this->assertSame(['path2' => 'path2_value'], $this->subject->get('path2.path2'));
+        $this->assertSame('path2_value', $this->subject->get('path2.path2.path2'));
+    }
+
+    public function testGet_invalidPath_throwsException()
+    {
+        $this->setExpectedException('Neat\Config\Exception\InvalidArgumentException');
+        $this->subject->get([]);
+    }
+
+    public function testGet_pathSeparator_throwsException()
+    {
+        $this->setExpectedException('Neat\Config\Exception\UnexpectedValueException');
+        $this->subject->get('.');
+    }
+
+    public function testGet_emptyPath_throwsException()
+    {
+        $this->setExpectedException('Neat\Config\Exception\UnexpectedValueException');
+        $this->subject->get('');
+    }
+
+    public function testGet_nonExistingOffset_throwsException()
+    {
+        $this->setExpectedException('Neat\Config\Exception\OutOfBoundsException');
+        $this->subject->get('offset');
+    }
+
+    public function testGet_nonExistingPath_throwsException()
+    {
+        $this->setExpectedException('Neat\Config\Exception\OutOfBoundsException');
+        $this->subject->get('path.path.path');
     }
 }

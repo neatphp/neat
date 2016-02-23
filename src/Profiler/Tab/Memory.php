@@ -7,7 +7,7 @@ namespace Neat\Profiler\Tab;
 class Memory extends AbstractTab
 {
 	/**
-	 * Returns the content.
+	 * Retrieves the content.
 	 *
 	 * @return string
 	 */

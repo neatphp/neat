@@ -15,17 +15,12 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->subject = new ClassLoader;
         $this->subject
-            ->setClassMap('Neat\Test\Loader\Fixture\TestClass3', [
-                __DIR__ . '/Fixture/TestClass3.php',
-            ])->setLocation($this->namespace, [__DIR__]);
-    }
-
-    /**
-     * @test
-     */
-    public function getClassMap_returnsArray()
-    {
-        $this->assertInternalType('array', $this->subject->getClassMaps());
+            ->setClassMaps([
+                'Neat\Test\Loader\Fixture\TestClass3' => __DIR__ . '/Fixture/TestClass3.php'
+            ])
+            ->setLocations([
+                $this->namespace => __DIR__
+            ]);
     }
 
     /**

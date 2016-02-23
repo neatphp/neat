@@ -7,7 +7,7 @@ namespace Neat\Widget;
 class Prompt extends Form
 {
 	/**
-	 * Returns the HTML string.
+	 * Retrieves the HTML string.
 	 *
 	 * @return string
 	 */

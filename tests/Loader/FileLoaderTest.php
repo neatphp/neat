@@ -14,72 +14,44 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->subject = new FileLoader;
-        $this->subject->setLocation($this->domain, [
-            __DIR__ . '/Fixture/dir3',
-            __DIR__ . '/Fixture/dir2',
-            __DIR__ . '/Fixture/dir1',
-        ]);
+        $this->subject
+            ->setPlaceholders([
+                'basedir' => __DIR__
+            ])
+            ->setLocations([
+                $this->domain => [
+                    '{{basedir}}/Fixture/dir3',
+                    '{{basedir}}/Fixture/dir2',
+                    '{{basedir}}/Fixture/dir1',
+                ]
+            ]);
     }
 
     /**
      * @test
      */
-    public function hasLocation_returnTrue()
+    public function locate_existingDomain()
     {
-        $this->assertTrue($this->subject->hasLocation($this->domain));
-    }
-
-    /**
-     * @test
-     */
-    public function hasLocation_returnFalse()
-    {
-        $this->assertFalse($this->subject->hasLocation('domain'));
-    }
-
-    /**
-     * @test
-     */
-    public function getLocation_existingDomain_returnsArray()
-    {
-        $location = $this->subject->getLocation($this->domain);
-        $this->assertInternalType('array', $location);
+        $this->assertInternalType('string', $this->subject->locate('test.txt', $this->domain));
+        $this->assertFalse($this->subject->locate('test.php', $this->domain));
     }
 
     /**
      * @test
      * @expectedException \Neat\Loader\Exception\UnexpectedValueException
      */
-    public function getLocation_emptyDomain_throwsException()
+    public function locate_emptyDomain()
     {
-        $this->subject->getLocation('');
+        $this->subject->locate('test.php', '');
     }
 
     /**
      * @test
      * @expectedException \Neat\Loader\Exception\OutOfBoundsException
      */
-    public function getLocation_nonExistingDomain_throwsException()
+    public function locate_nonExistingDomain()
     {
-        $this->subject->getLocation('non_existing_domain');
-    }
-
-    /**
-     * @test
-     */
-    public function getLocations_returnsArray()
-    {
-        $locations = $this->subject->getLocations();
-        $this->assertInternalType('array', $locations);
-    }
-
-    /**
-     * @test
-     */
-    public function locate()
-    {
-        $this->assertInternalType('string', $this->subject->locate('test.txt', $this->domain));
-        $this->assertFalse($this->subject->locate('test.php', $this->domain));
+        $this->subject->locate('test.php', 'non_existing_domain');
     }
 
     /**

@@ -4,7 +4,6 @@ namespace Neat\Profiler\Tab;
 use Neat\Loader\ClassLoader;
 use Neat\Loader\FileLoader;
 use Neat\Loader\PluginLoader;
-use Neat\Loader\TemplateLoader;
 
 /**
  * Searching paths.
@@ -13,9 +12,6 @@ class Locations extends AbstractTab
 {
     /** @var ClassLoader */
     private $classLoader;
-
-    /** @var TemplateLoader */
-	private $templateLoader;
 
     /** @var PluginLoader */
     private $pluginLoader;
@@ -27,21 +23,18 @@ class Locations extends AbstractTab
 	 * Constructor.
 	 *
 	 * @param ClassLoader    $classLoader
-     * @param TemplateLoader $templateLoader
      * @param PluginLoader   $pluginLoader
      * @param FileLoader     $fileLoader
 	 */
-	public function __construct(ClassLoader $classLoader, TemplateLoader $templateLoader,
-                                PluginLoader $pluginLoader, FileLoader $fileLoader)
+	public function __construct(ClassLoader $classLoader, PluginLoader $pluginLoader, FileLoader $fileLoader)
     {
 		$this->classLoader = $classLoader;
         $this->fileLoader = $fileLoader;
-        $this->templateLoader = $templateLoader;
         $this->pluginLoader = $pluginLoader;
 	}
 
 	/**
-	 * Returns the content.
+	 * Retrieves the content.
 	 *
 	 * @return string
 	 */
@@ -49,9 +42,6 @@ class Locations extends AbstractTab
 	{
         $content = '<span>Class Locations: </span>';
         $content .= $this->formatLocations($this->classLoader->getLocations());
-        $content .= '<br />';
-        $content .= '<span>Template Locations: </span>';
-        $content .= $this->formatLocations($this->templateLoader->getLocations());
         $content .= '<br />';
         $content .= '<span>Plugin Locations: </span>';
         $content .= $this->formatLocations($this->pluginLoader->getLocations());

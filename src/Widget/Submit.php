@@ -11,7 +11,7 @@ namespace Neat\Widget;
 class Submit extends AbstractWidget
 {
     /**
-     * Returns the HTML string.
+     * Retrieves the HTML string.
      *
      * @return string
      */

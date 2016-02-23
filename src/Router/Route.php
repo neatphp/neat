@@ -34,9 +34,9 @@ class Route
      * Constructor.
      *
      * @param string $pattern Pattern is in the form of 'xxx.:param.xxx/xxx/:param+'.
-     *                           Segment 'xxx' means a static text at the position.
-     *                           Segment ':param' means a parameter at the position.
-     *                           Segment ':param+' means a wildcard parameter at the position.
+     *                        Segment 'xxx' means a static text at the position.
+     *                        Segment ':param' means a parameter at the position.
+     *                        Segment ':param+' means a wildcard parameter at the position.
      */
     public function __construct($pattern)
     {
@@ -64,7 +64,7 @@ class Route
     }
 
     /**
-     * Returns the pattern.
+     * Retrieves the pattern.
      *
      * @return string
      */
@@ -74,7 +74,7 @@ class Route
     }
 
     /**
-     * Returns parameters.
+     * Retrieves parameters.
      *
      * @return Data
      */
@@ -84,7 +84,7 @@ class Route
     }
 
     /**
-     * Returns supported methods.
+     * Retrieves supported methods.
      *
      * @return Data
      */
@@ -94,7 +94,7 @@ class Route
     }
 
     /**
-     * Returns error.
+     * Retrieves error.
      *
      * @return string
      */

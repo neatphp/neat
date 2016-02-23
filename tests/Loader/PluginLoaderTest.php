@@ -1,9 +1,6 @@
 <?php
 namespace Neat\Test\Loader;
 
-use Mockery;
-use Mockery\Mock;
-use Neat\Http\Request;
 use Neat\Loader\PluginLoader;
 
 class PluginLoaderTest extends \PHPUnit_Framework_TestCase
@@ -11,25 +8,19 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
     /** @var PluginLoader */
     private $subject;
 
-    /** @var Mock|Request */
-    private $mockedRequest;
-
     /** @var string */
     private $superclass = 'Neat\Test\Loader\Fixture\PluginInterface';
 
     protected function setUp()
     {
-        $this->mockedRequest = Mockery::mock('Neat\Http\Request');
-        $this->subject = new PluginLoader(__DIR__, $this->mockedRequest);
-        $this->subject->setLocation($this->superclass, [
-            'Fixture/{{module}}/Plugin',
-            'Fixture/Plugin',
+        $this->subject = new PluginLoader();
+        $this->subject
+            ->setPlaceholder('basedir', __DIR__)
+            ->setPlaceholder('module', 'Module')
+            ->setLocation($this->superclass, [
+            '{{basedir}}/Fixture/{{module}}/Plugin',
+            '{{basedir}}/Fixture/Plugin',
         ]);
-
-        $this->mockedRequest
-            ->shouldReceive('get')
-            ->with('module')
-            ->andReturn('Module');
     }
 
     /**
@@ -65,6 +56,15 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
 
         $plugin2Class = 'Neat\Test\Loader\Fixture\Module\Plugin\Plugin2';
         $this->assertSame($plugin2Class, $this->subject->load('plugin 2', $this->superclass));
+    }
+
+    /**
+     * @test
+     * @expectedException \Neat\Loader\Exception\UnexpectedValueException
+     */
+    public function load_emptyPluginName()
+    {
+        $this->subject->load('', $this->superclass);
     }
 
     /**

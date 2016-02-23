@@ -15,20 +15,7 @@ class Router extends Component
 	private $routes = [];
 
     /**
-     * Constructor.
-     *
-     * @param array $settings
-     */
-    public function __construct(array $settings = [])
-    {
-        foreach ($settings as $key => $setting) {
-            $name = is_string($key) ? $key : null;
-            $this->addRoute($setting, $name);
-        }
-    }
-
-    /**
-     * Returns a route by name.
+     * Retrieves a route by name.
      *
      * @param string $name
      *
@@ -39,6 +26,23 @@ class Router extends Component
         $this->assertRouteExists($name);
 
         return $this->routes[$name];
+    }
+
+    /**
+     * Sets routes.
+     *
+     * @param array $routes
+     *
+     * @return Router
+     */
+    public function setRoutes(array $routes)
+    {
+        foreach ($routes as $key => $setting) {
+            $name = is_string($key) ? $key : null;
+            $this->addRoute($setting, $name);
+        }
+
+        return $this;
     }
 
     /**

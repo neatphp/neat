@@ -22,7 +22,10 @@ class Dispatcher
      */
     public function addListener($eventName, callable $listener, $priority = 0)
     {
-        if (!isset($this->listeners[$eventName])) $this->listeners[$eventName] = new PriorityList;
+        if (!isset($this->listeners[$eventName])) {
+            $this->listeners[$eventName] = new PriorityList;
+        }
+
         $this->listeners[$eventName]->insert($listener, $priority);
 
         return $this;
@@ -32,21 +35,25 @@ class Dispatcher
      * Dispatches an event;
      *
      * @param string $eventName
-     * @param array  $values
      * @param mixed  $subject
+     * @param array  $args
      *
      * @return Event
      */
-    public function dispatchEvent($eventName, array $values, $subject = null)
+    public function dispatchEvent($eventName, $subject, array $args)
     {
-        $event = new Event($eventName, $subject);
-        $event->setValues($values);
+        $event = new Event($eventName, $subject, $args);
 
-        if (!isset($this->listeners[$eventName])) return $event;
+        if (!isset($this->listeners[$eventName])) {
+            return $event;
+        }
 
         foreach ($this->listeners[$eventName] as $listener) {
             call_user_func($listener, $event);
-            if ($event->isCancelled()) break;
+
+            if ($event->isCancelled()) {
+                break;
+            }
         }
 
         return $event;

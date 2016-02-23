@@ -42,7 +42,7 @@ Class Timer
 	}
 
 	/**
-	 * Returns all records or one record.
+	 * Retrieves all records or one record.
 	 *
 	 * @param string $name
      *
@@ -63,7 +63,7 @@ Class Timer
 	}
 
     /**
-     * Returns call times of a timer.
+     * Retrieves call times of a timer.
      *
      * @param string $name
      *

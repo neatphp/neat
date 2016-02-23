@@ -20,43 +20,37 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->addListener('event2', [new Listener2, 'onEvent2Action']);
     }
 
-    /**
-     * @test
-     */
-    public function dispatchEvent1()
+    public function testDispatchEvent1()
     {
-        $values = [
-            'value1'  => 'event1_value1',
-            'value2'  => 'event2_value2',
-            'value3'  => 'event3_value3',
+        $args = [
+            'param1'  => 'event1_value1',
+            'param2'  => 'event1_value2',
+            'param3'  => 'event1_value3',
         ];
 
-        $event = $this->subject->dispatchEvent('event1', $values);
+        $event = $this->subject->dispatchEvent('event1', null, $args);
         $this->assertSame('event1', $event->getName());
         $this->assertNull($event->getSubject());
-        $this->assertSame('listener1_event1_value1', $event->value1);
-        $this->assertSame('listener1_event1_value2', $event->value2);
-        $this->assertSame('listener1_event1_value3', $event->value3);
+        $this->assertSame('listener1_event1_value1', $event->getParam('param1'));
+        $this->assertSame('listener2_event1_value2', $event->getParam('param2'));
+        $this->assertSame('event1_value3', $event->getParam('param3'));
         $this->assertTrue($event->isCancelled());
     }
 
-    /**
-     * @test
-     */
-    public function dispatchEvent2()
+    public function testDispatchEvent2()
     {
-        $values = [
-            'value1'  => 'event2_value1',
-            'value2'  => 'event2_value2',
-            'value3'  => 'event2_value3',
+        $args = [
+            'param1'  => 'event2_value1',
+            'param2'  => 'event2_value2',
+            'param3'  => 'event2_value3',
         ];
 
-        $event = $this->subject->dispatchEvent('event2', $values);
+        $event = $this->subject->dispatchEvent('event2', null, $args);
         $this->assertSame('event2', $event->getName());
         $this->assertNull($event->getSubject());
-        $this->assertSame('listener2_event2_value1', $event->value1);
-        $this->assertSame('listener2_event2_value2', $event->value2);
-        $this->assertSame('listener2_event2_value3', $event->value3);
+        $this->assertSame('listener1_event2_value1', $event->getParam('param1'));
+        $this->assertSame('listener2_event2_value2', $event->getParam('param2'));
+        $this->assertSame('event2_value3', $event->getParam('param3'));
         $this->assertFalse($event->isCancelled());
     }
 }

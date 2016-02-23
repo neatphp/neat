@@ -22,7 +22,7 @@ class Time extends AbstractTab
     }
 
 	/**
-	 * Returns the name.
+	 * Retrieves the name.
 	 *
 	 * @return string
 	 */
@@ -33,7 +33,7 @@ class Time extends AbstractTab
 	}
 
 	/**
-	 * Returns the content.
+	 * Retrieves the content.
 	 *
 	 * @return string
 	 */

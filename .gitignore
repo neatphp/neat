@@ -3,6 +3,3 @@
 /vendor
 .DS_Store
 composer.lock
-composer.phar
-coverage
-phpunit.xml

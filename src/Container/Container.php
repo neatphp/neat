@@ -2,11 +2,12 @@
 namespace Neat\Container;
 
 use Closure;
+use Interop\Container\ContainerInterface;
 
 /**
  * DI container.
  */
-class Container
+class Container implements ContainerInterface
 {
     /** @var array */
     private $objects = [];
@@ -23,13 +24,15 @@ class Container
     /**
      * Constructor.
      *
-     * @param array     $settings
-     * @param bool|true $autowiring
+     * @param array $settings
      */
-    public function __construct(array $settings = [], $autowiring = true)
+    public function __construct(array $settings = [])
     {
         foreach ($settings as $id => $value) {
-            if (is_string($value)) $value = Definition::singleton($value);
+            if (is_string($value)) {
+                $value = Definition::singleton($value);
+            }
+            
             if (is_int($id) && is_object($value)) {
                 if ($value instanceof Definition) {
                     $id = $value->getClass()->getName();
@@ -43,7 +46,7 @@ class Container
     }
 
     /**
-     * Returns an entry.
+     * Retrieves an entry.
      *
      * @param string $id
      *
@@ -66,9 +69,6 @@ class Container
         } else {
             if (!isset($this->definitions[$id])) {
                 $this->definitions[$id] = Definition::object($id);
-                if ($this->definitions[$id]->getClass()->isSubclassOf('Neat\Base\Component')) {
-                    $this->definitions[$id]->properties(true);
-                }
             }
 
             $object = $this->makeObject($this->definitions[$id]);
@@ -81,12 +81,20 @@ class Container
     }
 
     /**
+     * @param string $id
+     */
+    public function has($id)
+    {
+
+    }
+
+    /**
      * Sets an entry.
      *
      * @param string $id
      * @param mixed  $value
      *
-     * @return Container
+     * @return self
      */
     public function set($id, $value)
     {
@@ -119,10 +127,10 @@ class Container
      */
     private function makeObject(Definition $definition)
     {
-        $class = $definition->getClass();
+        $class                 = $definition->getClass();
         $constructorInjections = $this->parseReference($definition->getConstructorInjections());
-        $methodInjections = $this->parseReference($definition->getMethodInjections());
-        $propertyInjections = $this->parseReference($definition->getPropertyInjections());
+        $methodInjections      = $this->parseReference($definition->getMethodInjections());
+        $propertyInjections    = $this->parseReference($definition->getPropertyInjections());
 
         $object = $class->newInstanceArgs($constructorInjections);
 
@@ -160,11 +168,11 @@ class Container
 
         if (is_string($value) && 0 === strpos($value, '@')) {
             $segments = explode(':', substr($value, 1));
-            $id = array_shift($segments);
-            $method = array_shift($segments);
-            $object = $this->get($id);
+            $id       = array_shift($segments);
+            $method   = array_shift($segments);
+            $object   = $this->get($id);
 
-            return isset($method) ? call_user_func_array(array($object, $method), $segments) : $object;
+            return isset($method) ? call_user_func_array([$object, $method], $segments) : $object;
         }
 
         return $value;
@@ -172,6 +180,7 @@ class Container
 
     /**
      * @param string $id
+     *
      * @throws Exception\UnexpectedValueException
      */
     private function assertIdIsNotEmpty($id)
@@ -184,6 +193,7 @@ class Container
 
     /**
      * @param string $id
+     *
      * @throws Exception\OutOfBoundsException
      */
     private function assertEntryOrClassExists($id)
@@ -191,15 +201,17 @@ class Container
         if (!isset($this->objects[$id]) &&
             !isset($this->definitions[$id]) &&
             !isset($this->factories[$id]) &&
-            !class_exists($id)) {
+            !class_exists($id)
+        ) {
             $msg = sprintf('No entry or class found for "%s"', $id);
             throw new Exception\OutOfBoundsException($msg);
         }
     }
 
     /**
-     * @param mixed $value
+     * @param mixed  $value
      * @param string $id
+     *
      * @throws Exception\InvalidArgumentException
      */
     private function assertValueIsObject($value, $id)
@@ -212,6 +224,7 @@ class Container
 
     /**
      * @param string $id
+     *
      * @throws Exception\ReadonlyException
      */
     private function assertEntryIsOverridable($id)
@@ -224,6 +237,7 @@ class Container
 
     /**
      * @param string $id
+     *
      * @throws Exception\CircularDependencyException
      */
     private function assertNoCircularDependency($id)

@@ -24,7 +24,8 @@ class RouterTest extends AbstractComponentTest
         $this->mockedRequest = Mockery::mock('Neat\Http\Request');
         $this->mockedData = Mockery::mock('Neat\Data\Data');
 
-        $this->subject = new Router([
+        $this->subject = new Router;
+        $this->subject->setRoutes([
             'test' => [
                 'pattern' => '/name/:first/:last',
                 'defaultValues' => [

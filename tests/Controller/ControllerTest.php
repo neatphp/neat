@@ -5,7 +5,6 @@ use Mockery;
 use Mockery\Mock;
 use Neat\Http\Request;
 use Neat\Loader\PluginLoader;
-use Neat\Loader\TemplateLoader;
 use Neat\Test\Base\AbstractComponentTest;
 use Neat\Test\Controller\Fixture\Controller;
 
@@ -17,8 +16,8 @@ class ControllerTest extends AbstractComponentTest
     /** @var Mock|Request */
     protected $mockedRequest;
 
-    /** @var Mock|TemplateLoader */
-    protected $mockedTemplateLoader;
+    /** @var Mock|FileLoader */
+    protected $mockedFileLoader;
 
     /** @var Mock|PluginLoader */
     protected $mockedPluginLoader;
@@ -26,12 +25,12 @@ class ControllerTest extends AbstractComponentTest
     protected function setUp()
     {
         $this->mockedRequest = Mockery::mock('Neat\Http\Request');
-        $this->mockedTemplateLoader = Mockery::mock('Neat\Loader\TemplateLoader');
+        $this->mockedFileLoader = Mockery::mock('Neat\Loader\FileLoader');
         $this->mockedPluginLoader = Mockery::mock('Neat\Loader\PluginLoader');
 
         $this->subject = new Controller;
         $this->subject->request = $this->mockedRequest;
-        $this->subject->templateLoader = $this->mockedTemplateLoader;
+        $this->subject->fileLoader = $this->mockedFileLoader;
         $this->subject->pluginLoader = $this->mockedPluginLoader;
 
         parent::setUp();
@@ -102,9 +101,9 @@ class ControllerTest extends AbstractComponentTest
             return 'test';
         });
 
-        $this->mockedTemplateLoader
+        $this->mockedFileLoader
             ->shouldReceive('locate')
-            ->with('test', 'view')
+            ->with('test', 'template')
             ->andReturn('path');
 
         $response = $this->invokeMethod('render', ['test', ['param1' => 'value1', 'param2' => 'value2']]);
@@ -117,9 +116,9 @@ class ControllerTest extends AbstractComponentTest
      */
     public function render_withoutTemplateEngine_returnString()
     {
-        $this->mockedTemplateLoader
+        $this->mockedFileLoader
             ->shouldReceive('load')
-            ->with('test', 'view')
+            ->with('test', 'template')
             ->andReturn('test {{param1}} test {{param2}} test');
 
         $response = $this->invokeMethod('render', ['test', ['param1' => 'value1', 'param2' => 'value2']]);

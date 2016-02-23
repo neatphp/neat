@@ -26,10 +26,7 @@ class App
     protected $mode = self::MODE_DEV;
 
     /** @var string */
-	protected $appDir;
-
-    /** @var string */
-    protected $webDir;
+	protected $basedir;
 
     /** @var string */
     protected $namespace;
@@ -61,14 +58,12 @@ class App
      * Constructor.
      *
      * @param string $mode
-     * @param string $appDir
-     * @param string $webDir
+     * @param string $basedir
      */
-    public function __construct($mode, $appDir, $webDir)
+    public function __construct($mode, $basedir)
     {
         $this->mode = $mode;
-        $this->appDir = $appDir;
-        $this->webDir = $webDir;
+        $this->basedir = $basedir;
 
         $class = new ReflectionClass(get_class($this));
         $this->namespace = $class->getNamespaceName();
@@ -121,7 +116,7 @@ class App
     }
 
     /**
-     * Returns the working mode.
+     * Retrieves the working mode.
      *
      * @return string
      */
@@ -131,37 +126,17 @@ class App
     }
 
     /**
-     * Returns the base directory.
+     * Retrieves the base directory.
      *
      * @return string
      */
-    public function getAppDir()
+    public function getBasedir()
     {
-        return $this->appDir;
+        return $this->basedir;
     }
 
     /**
-     * Returns the web directory.
-     *
-     * @return string
-     */
-    public function getWebDir()
-    {
-        return str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->webDir);
-    }
-
-    /**
-     * Returns the config directory.
-     *
-     * @return string
-     */
-    public function getConfigDir()
-    {
-        return realpath($this->appDir . '/../etc/config');
-    }
-
-    /**
-     * Returns the namespace.
+     * Retrieves the namespace.
      *
      * @return string
      */
@@ -171,7 +146,7 @@ class App
     }
 
     /**
-     * Returns the loader.
+     * Retrieves the loader.
      *
      * @return ClassLoader
      */
@@ -179,7 +154,7 @@ class App
     {
         if (is_null($this->loader)) {
             $this->loader = new ClassLoader;
-            $this->loader->setLocation($this->getNamespace(), [$this->appDir]);
+            $this->loader->setLocation($this->getNamespace(), [$this->basedir . '/src']);
             $this->loader->setLocation('Neat', [__DIR__]);
         }
 
@@ -187,7 +162,7 @@ class App
     }
 
     /**
-     * Returns the services.
+     * Retrieves the services.
      *
      * @param string $name
      *
@@ -196,7 +171,7 @@ class App
     public function getServices($name = null)
     {
     	if (!$this->services) {
-            $path = $this->getConfigDir() . '/services.php';
+            $path = $this->basedir . '/etc/config/services.php';
             $this->services = new Container(require $path);
             $this->services->set('app', $this);
             $this->services->set('Neat\Loader\ClassLoader', $this->getLoader());
@@ -206,7 +181,7 @@ class App
     }
 
     /**
-     * Returns the controller.
+     * Retrieves the controller.
      *
      * @param Request|null $request
      *
@@ -219,15 +194,15 @@ class App
         $controllerClassName = sprintf(
             '%s\%s\Controller\%s',
             $this->getNamespace(),
-            $request->get('module'),
-            $request->get('controller')
+            $request->get('module', 'Module'),
+            $request->get('controller', 'Home')
         );
 
         return $this->getServices($controllerClassName);
     }
 
     /**
-     * Returns the profiler.
+     * Retrieves the profiler.
      *
      * @return Profiler
      */
@@ -283,7 +258,7 @@ class App
 
         /** @var Request $request */
         $request = $this->getServices('Neat\Router\Router')->route();
-        $response = $this->getController($request)->execute();
+        $response = $this->getController($request)->execute($request->get('action', 'index'));
         $response->send();
 
         if (self::MODE_DEV == $this->mode) {
@@ -311,7 +286,7 @@ class App
 
         $dumper = new Dumper;
         $path = __DIR__ . '/etc/template/';
-        $webDir = $this->getWebDir();
+        $baseUrl = dirname($this->getServices('Neat\Http\Request')->getBaseUrl());
 
         if ('cli' == substr(PHP_SAPI, 0, 3)) {
             $path .= 'debug.php';

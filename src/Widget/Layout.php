@@ -26,7 +26,7 @@ class Layout extends AbstractWidget
     }
 
     /**
-     * Returns the HTML string.
+     * Retrieves the HTML string.
      *
      * @return string
      */

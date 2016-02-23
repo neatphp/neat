@@ -10,33 +10,6 @@ class Filter
     private $callbacks = [];
 
     /**
-     * Constructor.
-     *
-     * @param array $settings
-     */
-    public function __construct(array $settings = [])
-    {
-        foreach ($settings as $name => $rule) {
-            $this->setRule($name, $rule);
-        }
-    }
-
-    /**
-     * Sets a rule.
-     *
-     * @param string   $name
-     * @param callable $rule
-     *
-     * @return Filter
-     */
-    public function setRule($name, callable $rule)
-    {
-        $this->callbacks[$name] = $rule;
-
-        return $this;
-    }
-
-    /**
      * Filtrates a value.
      *
      * @param string $name
@@ -46,16 +19,47 @@ class Filter
      */
     public function filtrate($name, $value)
     {
-        $method = str_replace(['.', '-', '_'], ' ', strtolower($name));
-        $method = 'filtrate' . str_replace(' ', '', ucwords($method));
-        if (method_exists($this, $method)) {
-            return $this->$method($value);
+        if (!isset($this->callbacks[$name])) {
+            return $value;
         }
 
-        if (isset($this->callbacks[$name])) {
-            return $this->callbacks[$name]($value);
+        foreach ($this->callbacks[$name] as $callback) {
+            $value = $callback($value);
         }
 
         return $value;
+    }
+
+    /**
+     * Appends a callback.
+     *
+     * @param string   $name
+     * @param callable $callback
+     *
+     * @return self
+     */
+    public function append($name, callable $callback)
+    {
+        if (!isset($this->callbacks[$name])) {
+            $this->callbacks[$name] = [];
+        }
+
+        $this->callbacks[$name][] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Removes callbacks.
+     *
+     * @param string $name
+     *
+     * @return self
+     */
+    public function remove($name)
+    {
+        unset($this->callbacks[$name]);
+
+        return $this;
     }
 }

@@ -6,13 +6,16 @@ use Neat\Data\Data;
 /**
  * Event.
  */
-class Event extends Data
+class Event
 {
     /** @var string */
     private $name;
 
     /** @var mixed */
     private $subject;
+
+    /** @var Data */
+    private $params;
 
     /** @var bool  */
     private $cancelled = false;
@@ -21,18 +24,19 @@ class Event extends Data
      * Constructor.
      *
      * @param string $name
-     * @param mixed $subject
+     * @param mixed  $subject
+     * @param array  $args
      */
-    public function __construct($name, $subject)
+    public function __construct($name, $subject, array $args)
     {
-        parent::__construct(true, false);
-
-        $this->name = $name;
+        $this->name    = $name;
         $this->subject = $subject;
+        $this->params  = new Data(array_keys($args));
+        $this->params->load($args);
     }
 
     /**
-     * Returns the event name.
+     * Retrieves the event name.
      *
      * @return string
      */
@@ -42,13 +46,25 @@ class Event extends Data
     }
 
     /**
-     * Returns the subject
+     * Retrieves the subject.
      *
      * @return mixed
      */
     public function getSubject()
     {
         return $this->subject;
+    }
+
+    /**
+     * Retrieves value of a parameter.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getParam($name)
+    {
+        return $this->params[$name];
     }
 
     /**
@@ -62,15 +78,31 @@ class Event extends Data
     }
 
     /**
+     * Sets value of a parameter.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function setParam($name, $value)
+    {
+        $this->params[$name] = $value;
+
+        return $this;
+    }
+
+    /**
      * Sets the flag, which tells whether event has been cancelled.
      *
      * @param bool $flag
      *
-     * @return Event
+     * @return self
      */
     public function setCancel($flag)
     {
         $this->cancelled = $flag;
+
         return $this;
     }
 }

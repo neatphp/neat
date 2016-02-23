@@ -2,6 +2,6 @@
 namespace Neat\Http\Exception;
 
 /**
- * Config exception.
+ * Http exception.
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface {}

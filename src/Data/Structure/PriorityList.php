@@ -13,7 +13,7 @@ class PriorityList implements IteratorAggregate
     private $values = [];
 
     /**
-     * Returns an external iterator.
+     * Retrieves an external iterator.
      *
      * @return ArrayIterator
      */
@@ -28,7 +28,7 @@ class PriorityList implements IteratorAggregate
      * @param mixed $value
      * @param int   $priority
      *
-     * @return PriorityList
+     * @return self
      */
     public function insert($value, $priority = 0)
     {
@@ -42,7 +42,7 @@ class PriorityList implements IteratorAggregate
      *
      * @param mixed $value
      *
-     * @return PriorityList
+     * @return self
      */
     public function remove($value)
     {
@@ -56,7 +56,7 @@ class PriorityList implements IteratorAggregate
     }
 
     /**
-     * Returns a random value.
+     * Retrieves a random value.
      *
      * @return mixed
      */
@@ -83,7 +83,7 @@ class PriorityList implements IteratorAggregate
     }
 
     /**
-     * Returns values as an array.
+     * Retrieves data as an array.
      *
      * @return array
      */

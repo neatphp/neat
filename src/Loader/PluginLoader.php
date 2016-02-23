@@ -6,13 +6,13 @@ use ReflectionClass;
 /**
  * Plugin loader.
  */
-class PluginLoader extends TemplateLoader
+class PluginLoader extends FileLoader
 {
     /** @var array */
-    protected $classes = [];
+    private $classes = [];
 
     /** @var array */
-    protected $namespaces = [];
+    private $namespaces = [];
 
     /**
      * Locates a plugin, which implements/extends a superclass.
@@ -69,7 +69,7 @@ class PluginLoader extends TemplateLoader
 	}
 
     /**
-     * Returns the class name.
+     * Retrieves the class name.
      *
      * @param string $pluginName
      *
@@ -84,7 +84,7 @@ class PluginLoader extends TemplateLoader
     }
 
     /**
-     * Returns the namespace.
+     * Retrieves the namespace.
      *
      * @param string $superclass
      *

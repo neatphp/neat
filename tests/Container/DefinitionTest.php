@@ -9,22 +9,16 @@ use Neat\Test\Container\Fixture\Service4;
 
 class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @test
-     */
-    public function getClass_returnsReflectionClass()
+    public function testGetClass_returnsReflectionClass()
     {
         $definition = Definition::object(Service1::class);
         $this->assertInstanceOf('ReflectionClass', $definition->getClass());
         $this->assertSame(Service1::class, $definition->getClass()->getName());
     }
 
-    /**
-     * @test
-     */
-    public function getPropertyInjections_returnsArray()
+    public function testGetPropertyInjections_returnsArray()
     {
-        $definition = Definition::object(Service1::class)->properties(true, 'property5', 'test');
+        $definition = Definition::object(Service1::class)->property('property5', 'test');
         $injections = $definition->getPropertyInjections();
 
         $this->assertInternalType('array', $injections);
@@ -36,10 +30,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test', $injections['property5']);
     }
 
-    /**
-     * @test
-     */
-    public function getConstructorInjections_returnsArray()
+    public function testGetConstructorInjections_returnsArray()
     {
         $definition = Definition::object(Service2::class, null, 'test');
         $injections = $definition->getConstructorInjections();
@@ -50,14 +41,11 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test', $injections['param2']);
     }
 
-    /**
-     * @test
-     */
-    public function getMethodInjections_returnsArray()
+    public function testGetMethodInjections_returnsArray()
     {
         $definition = Definition::object(Service3::class)
-            ->methods('setProperty1')
-            ->setProperty2('test');
+            ->method('setProperty1')
+            ->method('setProperty2', 'test');
         $injections = $definition->getMethodInjections();
 
         $this->assertInternalType('array', $injections);
@@ -66,21 +54,9 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test', $injections['setProperty2'][0]['param']);
     }
 
-    /**
-     * @test
-     * @expectedException \Neat\Container\Exception\UnexpectedValueException
-     */
-    public function properties_AnnotationEnabledAndNonExistingProperty_throwsException()
+    public function testProperty_withNonExistingProperty_throwsException()
     {
-        Definition::object(Service1::class)->properties(true, 'property6', 'test');
-    }
-
-    /**
-     * @test
-     * @expectedException \Neat\Container\Exception\UnexpectedValueException
-     */
-    public function properties_AnnotationNotEnabledAndNonExistingProperty_throwsException()
-    {
-        Definition::object(Service1::class)->properties(false, 'property3', 'test');
+        $this->setExpectedException('Neat\Container\Exception\UnexpectedValueException');
+        Definition::object(Service1::class)->property('property6', 'test');
     }
 }

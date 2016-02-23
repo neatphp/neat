@@ -1,9 +1,7 @@
 <?php
 namespace Neat\Test\Container\Fixture;
 
-use Neat\Base\Component;
-
-class Service4 extends Component
+class Service4
 {
     private $property;
 

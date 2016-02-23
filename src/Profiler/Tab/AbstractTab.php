@@ -7,7 +7,7 @@ namespace Neat\Profiler\Tab;
 abstract class AbstractTab
 {
     /**
-     * Returns the ID.
+     * Retrieves the ID.
      *
      * @return string
      */
@@ -17,7 +17,7 @@ abstract class AbstractTab
     }
 
     /**
-     * Returns the name.
+     * Retrieves the name.
      *
      * @return string
      */
@@ -28,7 +28,7 @@ abstract class AbstractTab
     }
 
     /**
-     * Returns the content.
+     * Retrieves the content.
      *
      * @return string
      */

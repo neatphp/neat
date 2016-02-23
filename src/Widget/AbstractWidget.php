@@ -22,7 +22,7 @@ abstract class AbstractWidget extends Object
     }
 
     /**
-     * Returns the string representation.
+     * Retrieves the string representation.
      *
      * @return string
      */
@@ -32,14 +32,14 @@ abstract class AbstractWidget extends Object
     }
 
     /**
-     * Returns the HTML string.
+     * Retrieves the HTML string.
      *
      * @return string
      */
     public abstract function toHtml();
 
     /**
-     * Returns the default css class.
+     * Retrieves the default css class.
      *
      * @return string
      */
@@ -49,7 +49,7 @@ abstract class AbstractWidget extends Object
     }
 
     /**
-     * Returns attributes.
+     * Retrieves attributes.
      *
      * @param array $names
      *

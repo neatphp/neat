@@ -15,7 +15,7 @@ namespace Neat\Widget;
 class Input extends AbstractWidget
 {
     /**
-     * Returns the HTML string.
+     * Retrieves the HTML string.
      *
      * @return string
      */

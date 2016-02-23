@@ -2,9 +2,7 @@
 namespace Neat\Test\Base;
 
 use Neat\Test\Base\Fixture\Component\Component;
-use Neat\Test\Base\Fixture\Component\Property1;
-use Neat\Test\Base\Fixture\Component\Property2;
-use Neat\Test\Base\Fixture\Component\Property3;
+use Neat\Test\Base\Fixture\Component\Property;
 
 class ComponentTest extends AbstractComponentTest
 {
@@ -18,70 +16,49 @@ class ComponentTest extends AbstractComponentTest
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function set_existingPropertyAndValidValue()
+    public function testSet_withExistingPropertyAndValidValue()
     {
-        $this->subject->property1 = new Property1;
-        $this->assertInstanceOf('Neat\Test\Base\Fixture\Component\Property1', $this->subject->property1);
-        $this->subject->property2 = new Property2;
-        $this->assertInstanceOf('Neat\Test\Base\Fixture\Component\Property2', $this->subject->property2);
-        $this->subject->property3 = new Property3;
-        $this->assertInstanceOf('Neat\Test\Base\Fixture\Component\Property3', $this->subject->property3);
+        $this->subject->property1 = new Property;
+        $this->assertInstanceOf('Neat\Test\Base\Fixture\Component\Property', $this->subject->property1);
+        $this->subject->property2 = 'string';
+        $this->assertSame('string', $this->subject->property2);
+        $this->subject->property3 = [];
+        $this->assertSame([], $this->subject->property3);
     }
 
-    /**
-     * @test
-     * @expectedException \Neat\Data\Exception\InvalidArgumentException
-     */
-    public function set_existingPropertyAndInvalidValue_throwsException()
+    public function testSet_withExistingPropertyAndInvalidValue_throwsException()
     {
+        $this->setExpectedException('Neat\Data\Exception\InvalidArgumentException');
         $this->subject->property1 = 'test';
     }
 
-    /**
-     * @test
-     * @expectedException \Neat\Data\Exception\ReadonlyException
-     */
-    public function set_existingPropertyWithValue_throwsException()
+    public function testSet_withExistingPropertyAndValidValue_throwsException()
     {
-        $this->subject->property1 = new Property1;
-        $this->subject->property1 = new Property1;
+        $this->setExpectedException('Neat\Data\Exception\ReadonlyException');
+        $this->subject->property1 = new Property;
+        $this->subject->property1 = new Property;
     }
 
-    /**
-     * @test
-     * @expectedException \Neat\Data\Exception\OverflowException
-     */
-    public function set_nonExistingOffset_throwsException()
+    public function testSet_withNonExistingOffset_throwsException()
     {
+        $this->setExpectedException('Neat\Data\Exception\OutOfBoundsException');
         $this->subject->property = 'test';
     }
 
-    /**
-     * @test
-     */
-    public function get_existingProperty()
+    public function testGet_withExistingProperty_returnsNull()
     {
-        $this->subject->property1;
-        $this->subject->property2;
-        $this->subject->property3;
+        $this->assertNull($this->subject->property1);
+        $this->assertNull($this->subject->property2);
+        $this->assertNull($this->subject->property3);
     }
 
-    /**
-     * @test
-     * @expectedException \Neat\Data\Exception\OutOfBoundsException
-     */
-    public function get_nonExistingOffset_throwsException()
+    public function testGet_withNonExistingProperty_throwsException()
     {
+        $this->setExpectedException('Neat\Data\Exception\OutOfBoundsException');
         $this->subject->property;
     }
 
-    /**
-     * @test
-     */
-    public function getConfig_returnConfigOrOptionValue()
+    public function testGetConfig_returnsConfigOrOptionValue()
     {
         $this->mockedConfig
             ->shouldReceive('get')
@@ -92,14 +69,11 @@ class ComponentTest extends AbstractComponentTest
         $this->assertSame('value', $this->subject->getConfig('option'));
     }
 
-    /**
-     * @test
-     */
-    public function dispatchEvent_returnEvent()
+    public function testDispatchEvent_returnsEvent()
     {
         $this->mockedEventDispatcher
             ->shouldReceive('dispatchEvent')
-            ->with('event', [], $this->subject)
+            ->with('event', $this->subject, [])
             ->andReturn($this->mockedEvent);
 
         $this->assertInstanceOf('Neat\Event\Event', $this->subject->dispatchEvent('event'));

@@ -9,35 +9,11 @@ class FileLoader
     /** @var array */
     protected $locations = [];
 
-    /**
-     * Tells whether a domain location exists.
-     *
-     * @param string $domain
-     *
-     * @return bool
-     */
-    public function hasLocation($domain)
-    {
-        return isset($this->locations[$domain]);
-    }
+    /** @var array */
+    protected $placeholders = [];
 
     /**
-     * Returns a domain location.
-     *
-     * @param string $domain
-     *
-     * @return array
-     */
-    public function getLocation($domain)
-    {
-        $this->assertDomainIsNotEmpty($domain);
-        $this->assertLocationExists($domain);
-
-        return $this->locations[$domain];
-    }
-
-    /**
-     * Returns locations.
+     * Retrieves locations.
      *
      * @return array
      */
@@ -47,16 +23,74 @@ class FileLoader
     }
 
     /**
-     * Sets a domain location.
+     * Return placeholders.
      *
-     * @param string $domain
-     * @param array  $dirs
+     * @return array
+     */
+    public function getPlaceholders()
+    {
+        return $this->placeholders;
+    }
+
+    /**
+     * Sets locations.
+     *
+     * @param array $locations
      *
      * @return FileLoader
      */
-    public function setLocation($domain, array $dirs)
+    public function setLocations(array $locations)
     {
-        $this->locations[$domain] = $dirs;
+        foreach ($locations as $domain => $dirs) {
+            $this->setLocation($domain, $dirs);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets a domain location.
+     *
+     * @param string       $domain
+     * @param string|array $dirs
+     * @return FileLoader
+     */
+    public function setLocation($domain, $dirs)
+    {
+        $this->assertDomainIsNotEmpty($domain);
+
+        $this->locations[$domain] = (array)$dirs;
+
+        return $this;
+    }
+
+    /**
+     * Sets placeholders.
+     *
+     * @param array $placeholders
+     *
+     * @return FileLoader
+     */
+    public function setPlaceholders(array $placeholders)
+    {
+        foreach ($placeholders as $name => $value) {
+            $this->setPlaceholder($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets a placeholder.
+     *
+     * @param string $name
+     * @param string $value
+     *
+     * @return FileLoader
+     */
+    public function setPlaceholder($name, $value)
+    {
+        $this->placeholders['{{' . $name . '}}'] = $value;
 
         return $this;
     }
@@ -71,7 +105,17 @@ class FileLoader
      */
     public function locate($file, $domain)
     {
-        foreach ($this->getLocation($domain) as $dir) {
+        $this->assertDomainIsNotEmpty($domain);
+        $this->assertLocationExists($domain);
+
+        $search = $replace = [];
+        if ($this->placeholders) {
+            $search = array_keys($this->placeholders);
+            $replace = array_values($this->placeholders);
+        }
+
+        foreach ($this->locations[$domain] as $dir) {
+            $dir = str_replace($search, $replace, $dir);
             $path = $dir . DIRECTORY_SEPARATOR . $file;
 
             if (is_file($path)) return $path;

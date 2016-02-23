@@ -86,7 +86,7 @@ Class Color
     }
 
     /**
-     * Returns a color gradient.
+     * Retrieves a color gradient.
      *
      * @param string|array $color
      *

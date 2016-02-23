@@ -5,7 +5,7 @@ use Neat\Data\Structure\PriorityList;
 
 class PriorityArrayTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var PriorityList  */
+    /** @var PriorityList */
     private $subject;
 
     protected function setUp()
@@ -16,10 +16,7 @@ class PriorityArrayTest extends \PHPUnit_Framework_TestCase
         $this->subject->insert('value3', 3);
     }
 
-    /**
-     * @test
-     */
-    public function insert()
+    public function testInsert()
     {
         $this->subject->insert('value4', 0);
         $this->subject->insert('value5', 1);
@@ -28,10 +25,7 @@ class PriorityArrayTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->subject->toArray());
     }
 
-    /**
-     * @test
-     */
-    public function remove()
+    public function testRemove()
     {
         $this->subject->insert('value4', 1);
         $this->subject->insert('value4', 2);
@@ -41,10 +35,7 @@ class PriorityArrayTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->subject->toArray());
     }
 
-    /**
-     * @test
-     */
-    public function random()
+    public function testRandom()
     {
         $this->assertTrue(in_array($this->subject->random(), ['value1', 'value2', 'value3']));
     }

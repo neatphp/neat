@@ -10,26 +10,42 @@ class ClassLoader extends FileLoader
     protected $classMaps = [];
 
     /**
-     * Returns class maps.
+     * Return class maps.
      *
      * @return array
      */
     public function getClassMaps()
     {
-        return $this->classMaps;
+        return $this->getClassMaps();
     }
-    
+
+    /**
+     * Sets class maps.
+     *
+     * @param array $classMaps
+     *
+     * @return ClassLoader
+     */
+    public function setClassMaps(array $classMaps)
+    {
+        foreach ($classMaps as $class => $map) {
+            $this->setClassMap($class, $map);
+        }
+
+        return $this;
+    }
+
     /**
      * Sets a class map.
      *
      * @param string $class
-     * @param array  $paths
+     * @param string|array  $map
      *
      * @return ClassLoader
      */
-    public function setClassMap($class, array $paths)
+    public function setClassMap($class, $map)
     {
-        $this->classMaps[$class] = $paths;
+        $this->classMaps[$class] = (array)$map;
 
         return $this;
     }

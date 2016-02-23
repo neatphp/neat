@@ -44,7 +44,7 @@ class Cookie extends Object
     }
 
     /**
-     * Returns cookie as an array.
+     * Retrieves cookie as an array.
      *
      * @return array
      */

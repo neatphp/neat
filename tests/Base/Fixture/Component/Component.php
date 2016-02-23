@@ -2,8 +2,8 @@
 namespace Neat\Test\Base\Fixture\Component;
 
 /**
- * @property \Neat\Test\Base\Fixture\Component\Property1 $property1
- * @property \Neat\Test\Base\Fixture\Component\Property2 $property2
- * @property \Neat\Test\Base\Fixture\Component\Property3 $property3
+ * @property \Neat\Test\Base\Fixture\Component\Property $property1
+ * @property string                                     $property2
+ * @property mixed                                      $property3
  */
 class Component extends \Neat\Base\Component {}

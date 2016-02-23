@@ -36,7 +36,8 @@ abstract class AbstractComponentTest extends \PHPUnit_Framework_TestCase
      * Invokes private/protected methods.
      *
      * @param string $methodName
-     * @param string array $args
+     * @param array  $args
+     *
      * @return mixed
      */
     protected function invokeMethod($methodName, array $args = [])

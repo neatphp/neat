@@ -7,7 +7,7 @@ namespace Neat\Profiler\Tab;
 class Files extends AbstractTab
 {
 	/**
-	 * Returns the name.
+	 * Retrieves the name.
 	 *
 	 * @return string
 	 */
@@ -17,7 +17,7 @@ class Files extends AbstractTab
 	}
 
 	/**
-	 * Returns the content.
+	 * Retrieves the content.
 	 *
 	 * @return string
 	 */

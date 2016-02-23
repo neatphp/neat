@@ -12,22 +12,16 @@ class Object
     /** @var Data */
     private $properties;
 
-    /** @var bool|true */
-    protected $readonly = false;
-
-    /** @var bool|true */
-    protected $fixed = true;
-
     /**
      * Deep cloning.
      */
     public function __clone()
     {
-        $this->properties = clone $this->properties;
+        $this->properties = clone $this->getProperties();
     }
 
     /**
-     * Returns value of a property or path.
+     * Retrieves value of a property or path.
      *
      * @param string $name
      *
@@ -35,7 +29,9 @@ class Object
      */
     public function __get($name)
     {
-        return $this->getProperties()->get($name);
+        $properties = $this->getProperties();
+
+        return $properties[$name];
     }
 
     /**
@@ -48,50 +44,74 @@ class Object
      */
     public function __set($name, $value)
     {
-        $this->getProperties()->set($name, $value);
+        $properties = $this->getProperties();
+        $properties[$name] = $value;
     }
 
     /**
-     * Returns properties.
+     * Retrieves properties.
      *
      * @return Data
      */
-    public function getProperties()
+    protected function getProperties()
     {
-        if (is_null($this->properties)) {
-            $this->properties = new Data($this->readonly, $this->fixed);
-            $validator = $this->properties->getValidator();
+        if ($this->properties) {
+            return $this->properties;
+        }
 
-            $classes[] = new ReflectionClass(get_class($this));
-            while ($parentClass = reset($classes)->getParentClass()) {
-                array_unshift($classes, $parentClass);
-            }
+        $classes[] = new ReflectionClass(get_class($this));
+        while ($parentClass = reset($classes)->getParentClass()) {
+            array_unshift($classes, $parentClass);
+        }
 
-            /** @var ReflectionClass $class */
-            foreach ($classes as $class) {
-                $comment = $class->getDocComment();
-                if (!$comment) continue;
+        $offsets  = [];
+        $readonly = [];
+        $rules    = [];
 
-                $lines = explode(PHP_EOL, $comment);
-                foreach ($lines as $line) {
+        /** @var ReflectionClass $class */
+        foreach ($classes as $class) {
+            $comment = $class->getDocComment();
+            if (!$comment) continue;
+
+            $lines = explode(PHP_EOL, $comment);
+            foreach ($lines as $line) {
+                $pos = stripos($line, '@property-read');
+                if ($pos !== false) {
+                    $isReadonly = true;
+                } else {
                     $pos = stripos($line, '@property');
-                    if (false !== $pos) {
-                        $property = explode(' ', preg_replace('/[ ]+/', ' ', substr($line, $pos)));
+                    $isReadonly = false;
+                }
 
-                        if (3 == count($property)) {
-                            $type = $property[1];
-                            $name = $property[2];
-                        } else {
-                            $type = null;
-                            $name = $property[1];
-                        }
+                if (false !== $pos) {
+                    $property = explode(' ', preg_replace('/[ ]+/', ' ', substr($line, $pos)));
 
-                        if ('$' == $name[0]) $name = substr($name, 1);
-                        $this->properties->loadOffsets([$name]);
-                        if (isset($type)) $validator->setRule($name, $type);
+                    $name = $property[1];
+                    if (3 == count($property)) {
+                        $name = $property[2];
+                        $type = $property[1];
+                    }
+
+                    if ('$' == $name[0]) {
+                        $name = substr($name, 1);
+                    }
+
+                    $offsets[] = $name;
+
+                    if ($isReadonly) {
+                        $readonly[] = $name;
+                    }
+
+                    if (isset($type)) {
+                        $rules[$name] = $type;
                     }
                 }
             }
+        }
+
+        $this->properties = new Data($offsets, $readonly);
+        foreach ($rules as $name => $rule) {
+            $this->properties->getValidator()->append($name, $rule);
         }
 
         return $this->properties;

@@ -37,30 +37,18 @@ class Definition
      */
     public function __construct($className, $unique, array $args)
     {
-        if (!isset(self::$classes[$className])) {
-            self::$classes[$className] = new ReflectionClass($className);
+        $this->setClass($className);
+
+        $method = $this->class->getConstructor();
+        if ($method) {
+            $this->setMethodInjections($method, $args);
         }
 
-        $this->class = self::$classes[$className];
-        $method = $this->class->getConstructor();
-        if (!is_null($method)) $this->setMethodInjections($method, $args);
+        if ($this->class->isSubclassOf('Neat\Base\Object')) {
+            $this->setPropertyInjections();
+        }
+
         $this->unique = $unique;
-
-        return $this;
-    }
-
-    /**
-     * Invokes method.
-     *
-     * @param string $name
-     * @param array  $args
-     *
-     * @return Definition
-     */
-    public function __call($name, array $args)
-    {
-        $method = $this->class->getMethod($name);
-        $this->setMethodInjections($method, $args);
 
         return $this;
     }
@@ -98,48 +86,41 @@ class Definition
     }
 
     /**
-     * Sets injection methods.
+     * Sets a method injection.
      *
-     * @return Definition
+     * @param string $name
+     *
+     * @return self
      */
-    public function methods()
+    public function method($name)
     {
-        $args = func_get_args();
-        foreach ($args as $methodName) {
-            $method = $this->class->getMethod($methodName);
-            $this->setMethodInjections($method);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets injection properties.
-     *
-     * @param bool|false $annotationEnabled
-     *
-     * @return Definition
-     */
-    public function properties($annotationEnabled = false)
-    {
-        if ($annotationEnabled) $this->setPropertyInjections();
-
         $args = func_get_args();
         array_shift($args);
-
-        while (!empty($args)) {
-            $propertyName = array_shift($args);
-            $propertyValue = array_shift($args);
-
-            $this->assertPropertyExists($propertyName);
-            $this->propertyInjections[$propertyName] = $propertyValue;
-        }
+        $method = $this->class->getMethod($name);
+        $this->setMethodInjections($method, $args);
 
         return $this;
     }
 
     /**
-     * Returns the class reflection.
+     * Sets a property injection.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function property($name, $value)
+    {
+        $this->assertPropertyExists($name);
+
+        $this->propertyInjections[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Retrieves the class reflection.
      *
      * @return ReflectionClass
      */
@@ -149,7 +130,7 @@ class Definition
     }
 
     /**
-     * Returns constructor injections.
+     * Retrieves constructor injections.
      *
      * @return array
      */
@@ -159,7 +140,7 @@ class Definition
     }
 
     /**
-     * Returns method injections.
+     * Retrieves method injections.
      *
      * @return array
      */
@@ -169,7 +150,7 @@ class Definition
     }
 
     /**
-     * Returns property injections.
+     * Retrieves property injections.
      *
      * @return array
      */
@@ -186,6 +167,22 @@ class Definition
     public function isUnique()
     {
         return $this->unique;
+    }
+
+    /**
+     * Sets the class reflection.
+     *
+     * @param $className
+     *
+     * @return void
+     */
+    private function setClass($className)
+    {
+        if (!isset(self::$classes[$className])) {
+            self::$classes[$className] = new ReflectionClass($className);
+        }
+
+        $this->class = self::$classes[$className];
     }
 
     /**
@@ -270,13 +267,14 @@ class Definition
     }
 
     /**
-     * @param string $propertyName
+     * @param string $name
+     *
      * @throws Exception\UnexpectedValueException
      */
-    private function assertPropertyExists($propertyName)
+    private function assertPropertyExists($name)
     {
-        if (!$this->class->hasProperty($propertyName) && !array_key_exists($propertyName, $this->propertyInjections)) {
-            $msg = sprintf('Property "%s" does not exist in class "%s".', $propertyName, $this->class->getName());
+        if (!$this->class->hasProperty($name) && !array_key_exists($name, $this->propertyInjections)) {
+            $msg = sprintf('Property "%s" does not exist in class "%s".', $name, $this->class->getName());
             throw new Exception\UnexpectedValueException($msg);
         }
     }
