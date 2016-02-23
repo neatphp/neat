@@ -1,0 +1,4 @@
+{
+  "app_dir": "{{appDir}}",
+  "web_dir": "{{webDir}}"
+}
