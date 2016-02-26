@@ -23,7 +23,7 @@ class Object
     }
 
     /**
-     * Retrieves value of a property or path.
+     * Retrieves value of a property.
      *
      * @param string $name
      *
@@ -31,11 +31,11 @@ class Object
      */
     public function __get($name)
     {
-        return $this->getProperties()[$name];
+        return $this->getProperty($name);
     }
 
     /**
-     * Sets value of a property or path.
+     * Sets value of a property.
      *
      * @param string $name
      * @param mixed  $value
@@ -44,75 +44,101 @@ class Object
      */
     public function __set($name, $value)
     {
-        $this->getProperties()[$name] = $value;
+        $this->setProperty($name, $value);
     }
 
     /**
-     * Retrieves properties.
+     * Retrieves value of a property.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getProperty($name)
+    {
+        return $this->initProperties()[$name];
+    }
+
+    /**
+     * Sets value of a property.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function setProperty($name, $value)
+    {
+        $this->initProperties()[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Initiates properties.
      *
      * @return Data
      */
-    protected function getProperties()
+    private function initProperties()
     {
-        if ($this->properties) {
-            return $this->properties;
-        }
+        if (!$this->properties) {
+            $this->properties = new Data;
 
-        $classes[] = new ReflectionClass(get_class($this));
-        while ($parentClass = reset($classes)->getParentClass()) {
-            array_unshift($classes, $parentClass);
-        }
+            $classes[] = new ReflectionClass(get_class($this));
+            while ($parentClass = reset($classes)->getParentClass()) {
+                array_unshift($classes, $parentClass);
+            }
 
-        $offsets  = [];
-        $readonly = [];
-        $rules    = [];
-
-        /** @var ReflectionClass $class */
-        foreach ($classes as $class) {
-            $comment = $class->getDocComment();
-            if (!$comment) continue;
-
-            $lines = explode(PHP_EOL, $comment);
-            foreach ($lines as $line) {
-                $pos = stripos($line, '@property-read');
-                if ($pos !== false) {
-                    $isReadonly = true;
-                } else {
-                    $pos = stripos($line, '@property');
-                    $isReadonly = false;
-                }
-
-                if (false !== $pos) {
-                    $property = explode(' ', preg_replace('/[ ]+/', ' ', substr($line, $pos)));
-
-                    $name = $property[1];
-                    if (3 == count($property)) {
-                        $name = $property[2];
-                        $type = $property[1];
-                    }
-
-                    if ('$' == $name[0]) {
-                        $name = substr($name, 1);
-                    }
-
-                    $offsets[] = $name;
-
-                    if ($isReadonly) {
-                        $readonly[] = $name;
-                    }
-
-                    if (isset($type)) {
-                        $rules[$name] = $type;
-                    }
+            /** @var ReflectionClass $class */
+            foreach ($classes as $class) {
+                $comment = $class->getDocComment();
+                if ($comment) {
+                    $this->parseComment($comment);
                 }
             }
         }
 
-        $this->properties = new Data($offsets, $readonly);
-        foreach ($rules as $name => $rule) {
-            $this->properties->getValidator()->append($name, $rule);
-        }
-
         return $this->properties;
+    }
+
+    /**
+     * Parses comment.
+     *
+     * @param string $comment
+     *
+     * @return void
+     */
+    private function parseComment($comment)
+    {
+        $lines = explode(PHP_EOL, $comment);
+        foreach ($lines as $line) {
+            $pos = stripos($line, '@property-read');
+            if ($pos !== false) {
+                $isReadonly = true;
+            } else {
+                $pos = stripos($line, '@property');
+                $isReadonly = false;
+            }
+
+            if (false !== $pos) {
+                $property = explode(' ', preg_replace('/[ ]+/', ' ', substr($line, $pos)));
+
+                $name = $property[1];
+                if (3 == count($property)) {
+                    $name = $property[2];
+                    $type = $property[1];
+                }
+
+                if ('$' == $name[0]) {
+                    $name = substr($name, 1);
+                }
+
+                $this->properties->init($name, null, $isReadonly);
+
+                if (isset($type)) {
+                    $this->properties->getValidator()->append($name, $type);
+                }
+            }
+        }
     }
 }

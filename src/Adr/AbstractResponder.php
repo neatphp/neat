@@ -22,15 +22,44 @@ class AbstractResponder extends Component
     public function __invoke()
     {
         $method = $this->getPayloadMethod();
+        $this->assertPayloadMethodExists($method);
         $this->$method();
     }
 
+    /**
+     * Payload method not found.
+     */
+    protected function notFound()
+    {
+        $this->response->status->set(404);
+        $this->response->content->set("<html><head><title>404 Not found</title></head><body>404 Not found</body></html>");
+    }
+
+    /**
+     * Payload method error.
+     */
+    protected function error()
+    {
+        $e = $this->payload->get('exception');
+        $this->response->status->set(500);
+        $this->response->content->set($e->getMessage());
+        $this->response->content->set("<html><head><title>404 Not found</title></head><body>404 Not found</body></html>");
+    }
+
+    /**
+     * Retrieves the payload method.
+     *
+     * @return string
+     */
     protected function getPayloadMethod()
     {
         $status = $this->payload->getStatus();
         $method = strtolower($status);
-        $method = str_replace('_', ' ', $method);
-        $method = ucfirst($method);
+        $method = ucwords($method, '_');
+        $method = str_replace('_', '', $method);
+        $method = lcfirst($method);
+
+        return $method;
     }
 
     /**
@@ -69,5 +98,18 @@ class AbstractResponder extends Component
         $widget = $class->newInstanceArgs($args);
 
         return $widget;
+    }
+
+    /**
+     * @param string $method
+     *
+     * @throws Exception\BadMethodCallException
+     */
+    private function assertPayloadMethodExists($method)
+    {
+        if (!method_exists($this, $method)) {
+            $msg = sprintf('Payload method "%s" does not exists in responder "%s".', $method, get_class($this));
+            throw new Exception\BadMethodCallException($msg);
+        }
     }
 }

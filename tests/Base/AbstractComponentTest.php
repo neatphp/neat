@@ -24,28 +24,11 @@ abstract class AbstractComponentTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->mockedConfig = Mockery::mock('Neat\Config\Config');
+        $this->mockedConfig          = Mockery::mock('Neat\Config\Config');
         $this->mockedEventDispatcher = Mockery::mock('Neat\Event\Dispatcher');
-        $this->mockedEvent = Mockery::mock('Neat\Event\Event');
+        $this->mockedEvent           = Mockery::mock('Neat\Event\Event');
 
-        $this->subject->config = $this->mockedConfig;
-        $this->subject->dispatcher = $this->mockedEventDispatcher;
-    }
-
-    /**
-     * Invokes private/protected methods.
-     *
-     * @param string $methodName
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    protected function invokeMethod($methodName, array $args = [])
-    {
-        $reflection = new \ReflectionClass(get_class($this->subject));
-        $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($this->subject, $args);
+        $this->subject->setProperty('config', $this->mockedConfig);
+        $this->subject->setProperty('dispatcher', $this->mockedEventDispatcher);
     }
 }

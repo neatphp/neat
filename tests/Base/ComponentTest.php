@@ -18,7 +18,7 @@ class ComponentTest extends AbstractComponentTest
 
     public function testSet_withExistingPropertyAndValidValue()
     {
-        $this->subject->property1 = new Property;
+        $this->subject->setProperty('property1', new Property);
         $this->assertInstanceOf('Neat\Test\Base\Fixture\Component\Property', $this->subject->property1);
         $this->subject->property2 = 'string';
         $this->assertSame('string', $this->subject->property2);
@@ -29,14 +29,14 @@ class ComponentTest extends AbstractComponentTest
     public function testSet_withExistingPropertyAndInvalidValue_throwsException()
     {
         $this->setExpectedException('Neat\Data\Exception\InvalidArgumentException');
-        $this->subject->property1 = 'test';
+        $this->subject->setProperty('property1', 'test');
     }
 
     public function testSet_withExistingPropertyAndValidValue_throwsException()
     {
         $this->setExpectedException('Neat\Data\Exception\ReadonlyException');
-        $this->subject->property1 = new Property;
-        $this->subject->property1 = new Property;
+        $this->subject->setProperty('property1', new Property);
+        $this->subject->setProperty('property1', new Property);
     }
 
     public function testSet_withNonExistingOffset_throwsException()
@@ -45,11 +45,10 @@ class ComponentTest extends AbstractComponentTest
         $this->subject->property = 'test';
     }
 
-    public function testGet_withExistingProperty_returnsNull()
+    public function testGet_withExistingProperty_throwsException()
     {
-        $this->assertNull($this->subject->property1);
-        $this->assertNull($this->subject->property2);
-        $this->assertNull($this->subject->property3);
+        $this->setExpectedException('Neat\Data\Exception\InvalidArgumentException');
+        $this->subject->property1;
     }
 
     public function testGet_withNonExistingProperty_throwsException()
