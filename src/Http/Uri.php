@@ -45,7 +45,7 @@ class Uri extends Object implements UriInterface
     {
         parent::__clone();
 
-        $this->getProperties()->reset('uri');
+        $this->getProperties()['uri'] = null;
     }
 
     /**

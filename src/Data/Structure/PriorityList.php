@@ -83,7 +83,7 @@ class PriorityList implements IteratorAggregate
     }
 
     /**
-     * Retrieves data as an array.
+     * Retrieves list as an array.
      *
      * @return array
      */

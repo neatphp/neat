@@ -7,9 +7,9 @@ use Neat\Event\Event;
 /**
  * Component properties can be accessed like public class members and should be injected by DI Container.
  *
- * @property \Neat\Config\Config     config
- * @property \Neat\Event\Dispatcher  dispatcher
- * @property \Neat\Profiler\Profiler profiler
+ * @property-read \Neat\Config\Config     config
+ * @property-read \Neat\Event\Dispatcher  dispatcher
+ * @property-read \Neat\Profiler\Profiler profiler
  */
 class Component extends Object
 {

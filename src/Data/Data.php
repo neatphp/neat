@@ -17,10 +17,10 @@ class Data implements ArrayAccess, IteratorAggregate
     private $values = [];
 
     /** @var array */
-    private $readonly = [];
+    private $offsets = [];
 
     /** @var array */
-    private $factories = [];
+    private $lazyloads = [];
 
     /** @var Helper\Filter */
     private $filter;
@@ -33,8 +33,8 @@ class Data implements ArrayAccess, IteratorAggregate
      */
     public function __clone()
     {
-        foreach ($this->values as &$value) {
-            if (is_object($value)) $value = clone $value;
+        foreach ($this->values as $key => $value) {
+            if (is_object($value)) $this->values[$key] = clone $value;
         }
 
         if ($this->filter) {
@@ -44,21 +44,6 @@ class Data implements ArrayAccess, IteratorAggregate
         if ($this->validator) {
             $this->validator = clone $this->validator;
         }
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param array $offsets
-     * @param array $readonly
-     */
-    public function __construct(array $offsets, array $readonly = [])
-    {
-        foreach ($offsets as $offset) {
-            $this->values[$offset] = null;
-        }
-
-        $this->readonly = $readonly;
     }
 
     /**
@@ -72,7 +57,7 @@ class Data implements ArrayAccess, IteratorAggregate
     {
         $this->assertOffsetNameIsNotEmpty($offset);
 
-        return isset($this->values[$offset]) || isset($this->factories[$offset]);
+        return isset($this->offsets[$offset]);
     }
 
     /**
@@ -87,17 +72,9 @@ class Data implements ArrayAccess, IteratorAggregate
         $this->assertOffsetNameIsNotEmpty($offset);
         $this->assertOffsetExists($offset);
 
-        if (!isset($this->values[$offset]) && isset($this->factories[$offset])) {
-            $value = $this->factories[$offset]($this);
-            $this->assertOffsetValueIsValid($offset, $value);
-
-            $this->values[$offset] = $value;
-        }
-
-        $value = $this->values[$offset];
-        if (isset($value) && $this->filter) {
-            $value = $this->filter->filtrate($offset, $value);
-        }
+        $this->lazyload($offset);
+        $this->validate($offset);
+        $value = $this->filtrate($offset);
 
         return $value;
     }
@@ -114,15 +91,10 @@ class Data implements ArrayAccess, IteratorAggregate
     {
         $this->assertOffsetNameIsNotEmpty($offset);
         $this->assertOffsetExists($offset);
-        $this->assertDataIsOverridable($offset);
+        $this->assertOffsetIsOverridable($offset);
 
-        if ($value instanceof Closure) {
-            $this->factories[$offset] = $value;
-            $this->values[$offset] = null;
-        } else {
-            $this->assertOffsetValueIsValid($offset, $value);
-            $this->values[$offset] = $value;
-        }
+        $this->values[$offset] = $value;
+        $this->validate($offset);
     }
 
     /**
@@ -137,6 +109,8 @@ class Data implements ArrayAccess, IteratorAggregate
         $this->assertOffsetNameIsNotEmpty($offset);
 
         unset($this->values[$offset]);
+        unset($this->offsets[$offset]);
+        unset($this->lazyloads[$offset]);
     }
 
     /**
@@ -150,38 +124,24 @@ class Data implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * Loads values.
+     * Initiates a offset.
      *
-     * @param array $values
-     *
-     * @return self
-     */
-    public function load(array $values)
-    {
-        foreach ($values as $offset => $value) {
-            $this[$offset] = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Resets data.
-     *
-     * @param string|null $offset
+     * @param string     $offset
+     * @param mixed|null $value
+     * @param bool|false $readonly
      *
      * @return self
      */
-    public function reset($offset = null)
+    public function init($offset, $value = null, $readonly = false)
     {
-        if ($offset) {
-            $this->assertOffsetExists($offset);
+        $this->assertOffsetNameIsNotEmpty($offset);
 
-            $this->values[$offset] = null;
-        } else {
-            foreach (array_keys($this->values) as $offset) {
-                $this->values[$offset] = null;
-            }
+        $this->values[$offset]  = $value;
+        $this->offsets[$offset] = $readonly;
+
+        if ($value instanceof Closure) {
+            $this->lazyloads[$offset] = $value;
+            $this->values[$offset]    = null;
         }
 
         return $this;
@@ -219,12 +179,62 @@ class Data implements ArrayAccess, IteratorAggregate
     public function toArray()
     {
         $values = [];
-        foreach (array_keys($this->values) as $offset) {
+        foreach (array_keys($this->offsets) as $offset) {
             $value = $this[$offset];
             $values[$offset] = $value instanceof Data ? $value->toArray() : $value;
         }
 
         return $values;
+    }
+
+    /**
+     * Lazy-loads value of offset.
+     *
+     * @param string $offset
+     *
+     * @return void
+     */
+    private function lazyload($offset)
+    {
+        if (isset($this->lazyloads[$offset]) && (!$this->offsets[$offset] || !isset($this->values[$offset]))) {
+            $this->values[$offset] = $this->lazyloads[$offset]($this);
+        }
+    }
+
+    /**
+     * Filtrates value of offset.
+     *
+     * @param string $offset
+     *
+     * @return mixed
+     */
+    private function filtrate($offset)
+    {
+        $value = $this->values[$offset];
+        if (isset($value) && $this->filter) {
+            $value = $this->filter->filtrate($offset, $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Validates value of offset.
+     *
+     * @param string $offset
+     *
+     * @return void
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    private function validate($offset)
+    {
+        if ($this->validator) {
+            $error = $this->validator->validate($offset, $this->values[$offset]);
+            if ($error) {
+                throw new Exception\InvalidArgumentException($error);
+            }
+        }
     }
 
     /**
@@ -242,28 +252,12 @@ class Data implements ArrayAccess, IteratorAggregate
 
     /**
      * @param string $offset
-     * @param mixed  $value
-     *
-     * @throws Exception\InvalidArgumentException
-     */
-    private function assertOffsetValueIsValid($offset, $value)
-    {
-        if ($this->validator) {
-            $error = $this->validator->validate($offset, $value);
-            if ($error) {
-                throw new Exception\InvalidArgumentException($error);
-            }
-        }
-    }
-
-    /**
-     * @param string $offset
      *
      * @throws Exception\OutOfBoundsException
      */
     private function assertOffsetExists($offset)
     {
-        if (!array_key_exists($offset, $this->values)) {
+        if (!isset($this->offsets[$offset])) {
             $msg = sprintf('Offset "%s" does not exist in data object.', $offset);
             throw new Exception\OutOfBoundsException($msg);
         }
@@ -274,9 +268,9 @@ class Data implements ArrayAccess, IteratorAggregate
      *
      * @throws Exception\ReadonlyException
      */
-    private function assertDataIsOverridable($offset)
+    private function assertOffsetIsOverridable($offset)
     {
-        if (in_array($offset, $this->readonly) && isset($this->values[$offset])) {
+        if ($this->offsets[$offset] && isset($this->values[$offset])) {
             $msg = sprintf('Offset "%s" is read-only and can not be overridden.', $offset);
             throw new Exception\ReadonlyException($msg);
         }

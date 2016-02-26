@@ -5,7 +5,7 @@ use Neat\Data\Data;
 use ReflectionClass;
 
 /**
- * Object.
+ * Base object.
  */
 class Object
 {
@@ -17,7 +17,9 @@ class Object
      */
     public function __clone()
     {
-        $this->properties = clone $this->getProperties();
+        if ($this->properties) {
+            $this->properties = clone $this->properties;
+        }
     }
 
     /**
@@ -29,9 +31,7 @@ class Object
      */
     public function __get($name)
     {
-        $properties = $this->getProperties();
-
-        return $properties[$name];
+        return $this->getProperties()[$name];
     }
 
     /**
@@ -44,8 +44,7 @@ class Object
      */
     public function __set($name, $value)
     {
-        $properties = $this->getProperties();
-        $properties[$name] = $value;
+        $this->getProperties()[$name] = $value;
     }
 
     /**
