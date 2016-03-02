@@ -22,12 +22,11 @@ class Cookie extends Object
      */
     public function __construct()
     {
-        $this->getProperties()
-            ->requireOffsets(['name'])
-            ->getFilter()->setRule('expire', function (Datetime $value) {
-                if (isset($value)) return $value->getTimestamp();
-                return $value;
-            });
+        $properties = $this->getProperties();
+        $properties->getValidator()->append('name', '!empty');
+        $properties->getFilter()->append('expire', function (Datetime $value) {
+            return $value->getTimestamp();
+        });
     }
 
     /**
@@ -40,6 +39,7 @@ class Cookie extends Object
     public function send($raw = false)
     {
         $function = $raw ? 'setrawcookie' : 'setcookie';
+
         return call_user_func_array($function, $this->toArray());
     }
 
@@ -50,6 +50,6 @@ class Cookie extends Object
      */
     public function toArray()
     {
-        return $this->getProperties()->toArray();
+        return ;
     }
 }

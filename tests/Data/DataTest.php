@@ -122,7 +122,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     public function testToArray_returnsArray()
     {
-        $this->subject['offset1'] = '';
+        $this->subject->load(['offset1' => '']);
         $this->subject['offset3']['offset1'] = 1;
         $this->subject['offset3']['offset2'] = '';
         $this->subject['offset3']['offset3'] = 'test';

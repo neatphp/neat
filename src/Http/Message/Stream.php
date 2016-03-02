@@ -4,7 +4,7 @@ namespace Neat\Http\Message;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * Stream.
+ * Data stream.
  */
 class Stream implements StreamInterface
 {
@@ -23,95 +23,89 @@ class Stream implements StreamInterface
     public function __construct($stream, $mode = 'r+')
     {
         if (is_string($stream)) {
-            $this->stream = fopen($stream, $mode);
-        } else {
-            $this->assertStreamIsValid($stream);
-            $this->stream = $stream;
+            $stream = fopen($stream, $mode);
         }
 
+        $this->assertStreamIsValid($stream);
+        $this->stream = $stream;
         $this->metadata = stream_get_meta_data($stream);
     }
 
     /**
-     * Reads all data from the stream into a string, from the beginning to end.
+     * Reads all data from the stream into a string.
      *
-     * This method MUST attempt to seek to the beginning of the stream before
-     * reading data and read the stream until the end is reached.
-     *
-     * Warning: This could attempt to load a large amount of data into memory.
-     *
-     * This method MUST NOT raise an exception in order to conform with PHP's
-     * string casting operations.
-     *
-     * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
      * @return string
      */
     public function __toString()
     {
         try {
             $this->rewind();
-            return $this->getContents();
+            $string = $this->getContents();
         } catch (\Exception $e) {
-            return '';
+            $string = '';
         }
+
+        return $string;
     }
 
     /**
-     * Closes the stream and any underlying resources.
+     * Closes the stream.
      *
      * @return void
      */
     public function close()
     {
         $stream = $this->detach();
+
         if ($stream) {
             fclose($stream);
         }
     }
 
     /**
-     * Separates any underlying resources from the stream.
+     * Detaches the stream.
      *
-     * After the stream has been detached, the stream is in an unusable state.
-     *
-     * @return resource|null Underlying PHP stream, if any
+     * @return resource|null
      */
     public function detach()
     {
         $stream = $this->stream;
-        $this->stream = null;
+        $this->stream   = null;
         $this->metadata = null;
 
         return $stream;
     }
 
     /**
-     * Get the size of the stream if known.
+     * Retrieves size of the stream.
      *
-     * @return int|null Returns the size in bytes if known, or null if unknown.
+     * @return int|null
      */
     public function getSize()
     {
         $size = null;
+
         if ($this->stream) {
             $stats = fstat($this->stream);
-            $size = $stats['size'];
+            $size  = $stats['size'];
         }
 
         return $size;
     }
 
     /**
-     * Returns the current position of the file read/write pointer
+     * Tells position of the read/write pointer in stream.
      *
-     * @return int Position of the file pointer
-     * @throws \RuntimeException on error.
+     * @return int
+     *
+     * @throws Exception\RuntimeException
      */
     public function tell()
     {
         $result = ftell($this->stream);
+
         if (false === $result) {
-            $msg = 'Error occurred during telling position of pointer in stream.';
+            $msg = 'Error occurred during telling position of the read/write pointer in stream.';
             throw new Exception\RuntimeException($msg);
         }
 
@@ -119,7 +113,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Returns true if the stream is at the end of the stream.
+     * Tells whether the read/write pointer is at the end of the stream.
      *
      * @return bool
      */
@@ -129,7 +123,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Returns whether or not the stream is seekable.
+     * Tells whether the stream is seekable.
      *
      * @return bool
      */
@@ -139,16 +133,12 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Seek to a position in the stream.
+     * Seeks to a position in the stream.
      *
-     * @link http://www.php.net/manual/en/function.fseek.php
-     * @param int $offset Stream offset
-     * @param int $whence Specifies how the cursor position will be calculated
-     *     based on the seek offset. Valid values are identical to the built-in
-     *     PHP $whence values for `fseek()`.  SEEK_SET: Set position equal to
-     *     offset bytes SEEK_CUR: Set position to current location plus offset
-     *     SEEK_END: Set position to end-of-stream plus offset.
-     * @throws \RuntimeException on failure.
+     * @param int $offset
+     * @param int $whence
+     *
+     * @throws Exception\RuntimeException
      */
     public function seek($offset, $whence = SEEK_SET)
     {
@@ -156,6 +146,7 @@ class Stream implements StreamInterface
         $this->assertStreamIsSeekable();
 
         $result = fseek($this->stream, $offset, $whence);
+
         if (-1 === $result) {
             $msg = 'Error occurred during seeking to a position in stream.';
             throw new Exception\RuntimeException($msg);
@@ -163,14 +154,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Seek to the beginning of the stream.
-     *
-     * If the stream is not seekable, this method will raise an exception;
-     * otherwise, it will perform a seek(0).
-     *
-     * @see seek()
-     * @link http://www.php.net/manual/en/function.fseek.php
-     * @throws \RuntimeException on failure.
+     * Seeks to the beginning of the stream.
      */
     public function rewind()
     {
@@ -178,7 +162,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Returns whether or not the stream is writable.
+     * Tells whether the stream is writable.
      *
      * @return bool
      */
@@ -189,6 +173,7 @@ class Stream implements StreamInterface
         }
 
         $mode = $this->metadata['mode'];
+
         return (
             strstr($mode, 'x')
             || strstr($mode, 'w')
@@ -199,11 +184,13 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Write data to the stream.
+     * Writes data to the stream.
      *
-     * @param string $string The string that is to be written.
-     * @return int Returns the number of bytes written to the stream.
-     * @throws \RuntimeException on failure.
+     * @param string $string
+     *
+     * @return int
+     *
+     * @throws Exception\RuntimeException
      */
     public function write($string)
     {
@@ -211,6 +198,7 @@ class Stream implements StreamInterface
         $this->assertStreamIsWritable();
 
         $result = fwrite($this->stream, $string);
+
         if (false === $result) {
             $msg = 'Error occurred during writing data to stream.';
             throw new Exception\RuntimeException($msg);
@@ -220,7 +208,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Returns whether or not the stream is readable.
+     * Tells whether the stream is readable.
      *
      * @return bool
      */
@@ -231,6 +219,7 @@ class Stream implements StreamInterface
         }
 
         $mode = $this->metadata['mode'];
+
         return (
             strstr($mode, 'r')
             || strstr($mode, '+')
@@ -238,14 +227,13 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Read data from the stream.
+     * Reads data from the stream.
      *
-     * @param int $length Read up to $length bytes from the object and return
-     *     them. Fewer than $length bytes may be returned if underlying stream
-     *     call returns fewer bytes.
-     * @return string Returns the data read from the stream, or an empty string
-     *     if no bytes are available.
-     * @throws \RuntimeException if an error occurs.
+     * @param int $length
+     *
+     * @return string
+     *
+     * @throws Exception\RuntimeException
      */
     public function read($length)
     {
@@ -253,6 +241,7 @@ class Stream implements StreamInterface
         $this->assertStreamIsReadable();
 
         $result = fread($this->stream, $length);
+
         if (false === $result) {
             $msg = 'Error occurred during reading data from stream.';
             throw new Exception\RuntimeException($msg);
@@ -262,11 +251,11 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Returns the remaining contents in a string
+     * Retrieves remaining contents in the stream.
      *
      * @return string
-     * @throws \RuntimeException if unable to read or an error occurs while
-     *     reading.
+     *
+     * @throws Exception\RuntimeException
      */
     public function getContents()
     {
@@ -274,8 +263,9 @@ class Stream implements StreamInterface
         $this->assertStreamIsReadable();
 
         $result = stream_get_contents($this->stream);
+
         if (false === $result) {
-            $msg = 'Error occurred during getting remaining content from stream.';
+            $msg = 'Error occurred during getting remaining contents from stream.';
             throw new Exception\RuntimeException($msg);
         }
 
@@ -283,16 +273,11 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Get stream metadata as an associative array or retrieve a specific key.
+     * Retrieves the stream metadata or value of the given key.
      *
-     * The keys returned are identical to the keys returned from PHP's
-     * stream_get_meta_data() function.
+     * @param string|null $key
      *
-     * @link http://php.net/manual/en/function.stream-get-meta-data.php
-     * @param string $key Specific metadata to retrieve.
-     * @return array|mixed|null Returns an associative array if no key is
-     *     provided. Returns a specific key value if a key is provided and the
-     *     value is found, or null if the key is not found.
+     * @return array|mixed|null
      */
     public function getMetadata($key = null)
     {
@@ -305,6 +290,7 @@ class Stream implements StreamInterface
 
     /**
      * @param mixed $stream
+     *
      * @throws Exception\InvalidArgumentException
      */
     private function assertStreamIsValid($stream)

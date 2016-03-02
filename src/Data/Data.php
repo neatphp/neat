@@ -148,6 +148,22 @@ class Data implements ArrayAccess, IteratorAggregate
     }
 
     /**
+     * Loads values.
+     *
+     * @param array $values
+     *
+     * @return self
+     */
+    public function load(array $values)
+    {
+        foreach ($values as $offset => $value) {
+            $this[$offset] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
      * Retrieves the filter.
      *
      * @return Filter

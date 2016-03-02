@@ -27,26 +27,6 @@ class AbstractResponder extends Component
     }
 
     /**
-     * Payload method not found.
-     */
-    protected function notFound()
-    {
-        $this->response->status->set(404);
-        $this->response->content->set("<html><head><title>404 Not found</title></head><body>404 Not found</body></html>");
-    }
-
-    /**
-     * Payload method error.
-     */
-    protected function error()
-    {
-        $e = $this->payload->get('exception');
-        $this->response->status->set(500);
-        $this->response->content->set($e->getMessage());
-        $this->response->content->set("<html><head><title>404 Not found</title></head><body>404 Not found</body></html>");
-    }
-
-    /**
      * Retrieves the payload method.
      *
      * @return string

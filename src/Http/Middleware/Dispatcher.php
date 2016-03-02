@@ -18,7 +18,7 @@ class Dispatcher
      *
      * @param MiddlewareInterface $middleware
      *
-     * @return static
+     * @return self
      */
     public function append(MiddlewareInterface $middleware)
     {

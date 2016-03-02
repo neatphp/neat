@@ -56,7 +56,7 @@ class Object
      */
     public function getProperty($name)
     {
-        return $this->initProperties()[$name];
+        return $this->getProperties()[$name];
     }
 
     /**
@@ -69,7 +69,7 @@ class Object
      */
     public function setProperty($name, $value)
     {
-        $this->initProperties()[$name] = $value;
+        $this->getProperties()[$name] = $value;
 
         return $this;
     }
@@ -79,7 +79,7 @@ class Object
      *
      * @return Data
      */
-    private function initProperties()
+    public function getProperties()
     {
         if (!$this->properties) {
             $this->properties = new Data;

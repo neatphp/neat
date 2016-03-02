@@ -5,17 +5,17 @@ use Neat\Base\Object;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Request Uri.
+ * URI value object.
  *
- * @property string scheme
- * @property string user
- * @property string pass
- * @property string host
- * @property int    port
- * @property string path
- * @property string query
- * @property string fragment
- * @property string uri
+ * @property-read string scheme
+ * @property-read string user
+ * @property-read string pass
+ * @property-read string host
+ * @property-read int    port
+ * @property-read string path
+ * @property-read string query
+ * @property-read string fragment
+ * @property-read string uri
  */
 class Uri extends Object implements UriInterface
 {
@@ -33,8 +33,8 @@ class Uri extends Object implements UriInterface
     public function __construct($uri = null)
     {
         if ($uri) {
+            $this->getProperties()->load(parse_url($uri));
             $this->uri = $uri;
-            $this->getProperties()->loadValues(parse_url($uri));
         }
     }
 
@@ -45,7 +45,7 @@ class Uri extends Object implements UriInterface
     {
         parent::__clone();
 
-        $this->getProperties()['uri'] = null;
+        $this->uri = null;
     }
 
     /**
