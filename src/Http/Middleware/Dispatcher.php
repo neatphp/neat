@@ -6,7 +6,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use SplQueue;
 
 /**
- * Middleware dispatcher.
+ * Http middleware dispatcher.
  */
 class Dispatcher
 {
@@ -45,7 +45,7 @@ class Dispatcher
             return $response;
         }
 
-        /** @var callable $middleware */
+        /** @var MiddlewareInterface $middleware */
         $middleware = $this->queue->pop();
 
         return $middleware($request, $response, $this);

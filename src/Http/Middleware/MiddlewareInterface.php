@@ -5,7 +5,7 @@ use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 /**
- * Middleware.
+ * Http middleware.
  */
 interface MiddlewareInterface
 {

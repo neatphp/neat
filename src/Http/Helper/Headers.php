@@ -4,7 +4,7 @@ namespace Neat\Http\Helper;
 use Neat\Base\Object;
 
 /**
- * Header.
+ * Http headers.
  *
  * @property string cache_control
  * @property string date
@@ -43,54 +43,54 @@ class Headers extends Object
 {
     /** @var array */
     private $formats = [
-    	'cache_control' => 'Cache-Control: %s',
-    	'date' => 'Date: %s GMT',
-    	'pragma' => 'Pragma: %s',
-    	'accept' => 'Accept: %s',
-    	'accept_charset' => 'Accept-Charset: %s',
-    	'accept_encoding' => 'Accept-Encoding: %s',
-    	'accept_language' => 'Accept-Language: %s',
-    	'accept_ranges' => 'Accept-Ranges: %s',
-    	'authorization' => 'Authorization: Basic %s',
-    	'connection' => 'Connection: %s',
-    	'cookie' => 'Cookie: %s',
-    	'host' => 'Host: %s',
-    	'if_modified_since' => 'If-Modified-Since: %s GMT',
-    	'if_none_match' => 'If-None-Match: %s',
-    	'user_agent' => 'User-Agent: %s',
-    	'age' => 'Age: %s',
-    	'allow' => 'Allow: %s',
-    	'content_encoding' => 'Content-Encoding: %s',
-    	'content_language' => 'Content-Language: %s',
-    	'content_length' => 'Content-Length: %s',
-    	'content_location' => 'Content-Location: %s',
+    	'cache_control'       => 'Cache-Control: %s',
+    	'date'                => 'Date: %s GMT',
+    	'pragma'              => 'Pragma: %s',
+    	'accept'              => 'Accept: %s',
+    	'accept_charset'      => 'Accept-Charset: %s',
+    	'accept_encoding'     => 'Accept-Encoding: %s',
+    	'accept_language'     => 'Accept-Language: %s',
+    	'accept_ranges'       => 'Accept-Ranges: %s',
+    	'authorization'       => 'Authorization: Basic %s',
+    	'connection'          => 'Connection: %s',
+    	'cookie'              => 'Cookie: %s',
+    	'host'                => 'Host: %s',
+    	'if_modified_since'   => 'If-Modified-Since: %s GMT',
+    	'if_none_match'       => 'If-None-Match: %s',
+    	'user_agent'          => 'User-Agent: %s',
+    	'age'                 => 'Age: %s',
+    	'allow'               => 'Allow: %s',
+    	'content_encoding'    => 'Content-Encoding: %s',
+    	'content_language'    => 'Content-Language: %s',
+    	'content_length'      => 'Content-Length: %s',
+    	'content_location'    => 'Content-Location: %s',
     	'content_disposition' => 'Content-Disposition: %s; filename=%s',
-    	'content_md5' => 'Content-MD5: %s',
-    	'content_range' => 'Content-Range: %s',
-    	'content_type' => 'Content-Type: %s; charset=%s',
-    	'etag' => 'ETag: %s',
-    	'expires' => 'Expires: %s GMT',
-    	'last_modified' => 'Last-Modified: %s GMT',
-    	'location' => 'Location: %s',
-    	'refresh' => 'Refresh: %s; url=%s',
-    	'server' => 'Server: %s',
-    	'set_cookie' => 'Set-Cookie: %s',
+    	'content_md5'         => 'Content-MD5: %s',
+    	'content_range'       => 'Content-Range: %s',
+    	'content_type'        => 'Content-Type: %s; charset=%s',
+    	'etag'                => 'ETag: %s',
+    	'expires'             => 'Expires: %s GMT',
+    	'last_modified'       => 'Last-Modified: %s GMT',
+    	'location'            => 'Location: %s',
+    	'refresh'             => 'Refresh: %s; url=%s',
+    	'server'              => 'Server: %s',
+    	'set_cookie'          => 'Set-Cookie: %s',
     ];
 
     /**
-     * Sends header.
+     * Sends the headers.
      *
      * @return void
      */
     public function send()
     {
         foreach ($this->toArray() as $value) {
-            if (isset($value)) header($value);
+            header($value);
         }
     }
 
     /**
-     * Retrieves header as an array.
+     * Returns values as an array.
      *
      * @return array
      */
@@ -98,20 +98,12 @@ class Headers extends Object
     {
         $values = [];
         foreach ($this->getProperties() as $name => $value) {
+            if (!isset($value)) continue;
+
+            $args   = (array)$value;
             $format = $this->formats[$name];
-
-            if (is_string($value)) {
-                $values[$name] = sprintf($format, $value);
-
-                continue;
-            }
-
-            if (is_array($value)) {
-                array_unshift($value, $format);
-                $values[$name] = call_user_func_array('sprintf', $value);
-
-                continue;
-            }
+            array_unshift($args, $format);
+            $values[$name] = call_user_func_array('sprintf', $args);
         }
 
         return $values;

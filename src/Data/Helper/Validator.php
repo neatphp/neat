@@ -15,7 +15,7 @@ class Validator
      * @param string $name
      * @param mixed  $value
      *
-     * @return string|null
+     * @return string
      */
     public function validate($name, $value)
     {
@@ -23,21 +23,17 @@ class Validator
             return null;
         }
 
-        $error = null;
+        $error = '';
         foreach ($this->rules[$name] as $rule) {
-            $valid = true;
             if (isset($rule['class'])) {
-                $class = $rule['class'];
-                $valid = $value instanceof $class;
+                $class   = $rule['class'];
+                $isValid = $value instanceof $class;
             } elseif (isset($rule['callback'])) {
                 $callback = $rule['callback'];
-                $valid = $callback($value);
+                $isValid  = $callback($value);
             }
 
-            $not = $rule['not'];
-            if ($valid && !$not || !$valid && $not) {
-                continue;
-            }
+            if ($isValid) continue;
 
             $type = is_object($value) ? get_class($value) : gettype($value);
             $error = sprintf($rule['error'], $type);
@@ -60,20 +56,21 @@ class Validator
             $this->rules[$name] = [];
         }
 
-        $item['not']   = false;
         $item['error'] = sprintf('Validation failed on "%s": ', $name);
 
         if (is_string($rule)) {
-            if ('!' == $rule[0]) {
-                $item['not'] = true;
-                $rule = trim(substr($rule, 1));
-            }
-
             if (class_exists($rule)) {
                 $item['class'] = $rule;
                 $item['error'] .= sprintf('instance of "%s" expected, ', $rule) . '"%s" given.';
             } else {
                 $type = strtolower($rule);
+                if ('required' == $type) {
+                    $item['callback'] = function ($value) {
+                        return !empty($value);
+                    };
+                    $item['error'] .= 'value should not be empty.';
+                }
+
                 if (false !== strpos($type, '[]')) {
                     $type = 'array';
                 }

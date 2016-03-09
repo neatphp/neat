@@ -73,7 +73,6 @@ class Data implements ArrayAccess, IteratorAggregate
         $this->assertOffsetExists($offset);
 
         $this->lazyload($offset);
-        $this->validate($offset);
         $value = $this->filtrate($offset);
 
         return $value;

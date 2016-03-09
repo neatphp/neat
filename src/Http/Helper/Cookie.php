@@ -5,7 +5,7 @@ use DateTime;
 use Neat\Base\Object;
 
 /**
- * Cookie.
+ * Http cookie.
  *
  * @property string   $name
  * @property string   $value
@@ -23,18 +23,25 @@ class Cookie extends Object
     public function __construct()
     {
         $properties = $this->getProperties();
-        $properties->getValidator()->append('name', '!empty');
-        $properties->getFilter()->append('expire', function (Datetime $value) {
-            return $value->getTimestamp();
-        });
+
+        $properties
+            ->getValidator()
+            ->append('name', 'required');
+
+        $properties
+            ->getFilter()
+            ->append('expire', function (Datetime $value) {
+                return $value->getTimestamp();
+            });
     }
 
     /**
-     * Sends this cookie.
+     * Sends the cookie.
      *
-     * @param bool|false $raw
+     * @param bool|false $raw If false, sends the cookie without url-encoding the value.
      *
-     * @return bool
+     * @return bool If output exists prior to calling of this method, returns false.
+     *              This does not indicate whether the user accepted the cookie.
      */
     public function send($raw = false)
     {
@@ -44,12 +51,12 @@ class Cookie extends Object
     }
 
     /**
-     * Retrieves cookie as an array.
+     * Returns values as an array.
      *
      * @return array
      */
     public function toArray()
     {
-        return ;
+        return $this->getProperties()->toArray();
     }
 }

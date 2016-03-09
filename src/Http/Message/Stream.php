@@ -17,8 +17,8 @@ class Stream implements StreamInterface
     /**
      * Constructor.
      *
-     * @param string|resource $stream
-     * @param string          $mode
+     * @param string|resource $stream The stream identifier or stream resource.
+     * @param string          $mode   The type of access you require to the stream.
      */
     public function __construct($stream, $mode = 'r+')
     {
@@ -34,7 +34,7 @@ class Stream implements StreamInterface
     /**
      * Reads all data from the stream into a string.
      *
-     * @return string
+     * @return string Stream contents in string format.
      */
     public function __toString()
     {
@@ -65,7 +65,7 @@ class Stream implements StreamInterface
     /**
      * Detaches the stream.
      *
-     * @return resource|null
+     * @return resource|null Underlying PHP stream, if any.
      */
     public function detach()
     {
@@ -79,7 +79,7 @@ class Stream implements StreamInterface
     /**
      * Retrieves size of the stream.
      *
-     * @return int|null
+     * @return int|null The size in bytes if known, or null if unknown.
      */
     public function getSize()
     {
@@ -96,9 +96,9 @@ class Stream implements StreamInterface
     /**
      * Tells position of the read/write pointer in stream.
      *
-     * @return int
+     * @return int Position of the pointer.
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException on error.
      */
     public function tell()
     {
@@ -135,10 +135,10 @@ class Stream implements StreamInterface
     /**
      * Seeks to a position in the stream.
      *
-     * @param int $offset
-     * @param int $whence
+     * @param int $offset Stream offset.
+     * @param int $whence How the cursor position should be calculated.
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException on error.
      */
     public function seek($offset, $whence = SEEK_SET)
     {
@@ -155,6 +155,8 @@ class Stream implements StreamInterface
 
     /**
      * Seeks to the beginning of the stream.
+     *
+     * @return void
      */
     public function rewind()
     {
@@ -186,11 +188,11 @@ class Stream implements StreamInterface
     /**
      * Writes data to the stream.
      *
-     * @param string $string
+     * @param string $string The string that is to be written.
      *
-     * @return int
+     * @return int The number of bytes written to the stream.
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException on error.
      */
     public function write($string)
     {
@@ -229,11 +231,11 @@ class Stream implements StreamInterface
     /**
      * Reads data from the stream.
      *
-     * @param int $length
+     * @param int $length The number of bytes to read from the stream.
      *
-     * @return string
+     * @return string The string read from the stream.
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException on error.
      */
     public function read($length)
     {
@@ -253,9 +255,9 @@ class Stream implements StreamInterface
     /**
      * Retrieves remaining contents in the stream.
      *
-     * @return string
+     * @return string Stream contents in string format.
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException on error.
      */
     public function getContents()
     {
@@ -275,9 +277,11 @@ class Stream implements StreamInterface
     /**
      * Retrieves the stream metadata or value of the given key.
      *
-     * @param string|null $key
+     * @param string $key A key in metadata.
      *
-     * @return array|mixed|null
+     * @return array|mixed|null The metadata if no key is specified,
+     *                          or a key value if the specific key exists in metadata,
+     *                          or null if the specific key does not exist in metadata.
      */
     public function getMetadata($key = null)
     {
@@ -291,7 +295,7 @@ class Stream implements StreamInterface
     /**
      * @param mixed $stream
      *
-     * @throws Exception\InvalidArgumentException
+     * @throws Exception\InvalidArgumentException when the steam is invalid.
      */
     private function assertStreamIsValid($stream)
     {
@@ -302,7 +306,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException when the steam is not available.
      */
     private function assertStreamIsAvailable()
     {
@@ -313,7 +317,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException when the stream is not seekable.
      */
     private function assertStreamIsSeekable()
     {
@@ -324,7 +328,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException when the steam is not readable.
      */
     private function assertStreamIsReadable()
     {
@@ -335,7 +339,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @throws Exception\RuntimeException
+     * @throws Exception\RuntimeException when the steam is not writable.
      */
     private function assertStreamIsWritable()
     {

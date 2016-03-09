@@ -1,5 +1,5 @@
 <?php
-namespace Neat\Http;
+namespace Neat\Http\Message;
 
 use Neat\Data\Data;
 use Neat\Http\Message\Message;
