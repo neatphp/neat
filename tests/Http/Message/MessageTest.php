@@ -1,21 +1,11 @@
 <?php
-/*
- * Copyright (c) 2015 babymarkt.de GmbH - All Rights Reserved
- *
- * All information contained herein is, and remains the property of babymarkt.de GmbH
- * and is protected by copyright law. Unauthorized copying of this file or any parts,
- * via any medium is strictly prohibited.
- */
+namespace Message;
 
-namespace Babymarkt\Insect\Cable\Tests\Unit\Communication\Message;
-
-use Babymarkt\Insect\Cable\Communication\Message\Message;
 use Psr\Http\Message\StreamInterface;
 
 /**
  * Class MessageTest
  *
- * @package Babymarkt\Insect\Cable\Tests\Unit
  * @group Message
  */
 class MessageTest extends \PHPUnit_Framework_TestCase
@@ -30,7 +20,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->messageMock = $this->getMockForAbstractClass('Babymarkt\Insect\Cable\Communication\Message\Message');
+        $this->messageMock = $this->getMockForAbstractClass('');
     }
 
     /**

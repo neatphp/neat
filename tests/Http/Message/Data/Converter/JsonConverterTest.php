@@ -1,20 +1,9 @@
 <?php
-/*
- * Copyright (c) 2015 babymarkt.de GmbH - All Rights Reserved
- *
- * All information contained herein is, and remains the property of babymarkt.de GmbH
- * and is protected by copyright law. Unauthorized copying of this file or any parts,
- * via any medium is strictly prohibited.
- */
-
-namespace Babymarkt\Insect\Cable\Tests\Unit\Communication\Message\Data\Converter;
-
-use Babymarkt\Insect\Cable\Communication\Message\Data\Converter\JsonConverter;
+namespace Converter;
 
 /**
  * Class JsonConverterTest
  *
- * @package Babymarkt\Insect\Cable\Tests\Unit
  * @group Cable
  * @group DataConverter
  */
@@ -22,8 +11,7 @@ class JsonConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Class under test
-     *
-     * @var JsonConverter|\PHPUnit_Framework_MockObject_MockObject
+
      */
     protected $converter;
 
@@ -35,7 +23,6 @@ class JsonConverterTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->converter = $this->getMock(
-            'Babymarkt\Insect\Cable\Communication\Message\Data\Converter\JsonConverter',
             array('getLastError', 'getLastErrorMessage', 'jsonEncode', 'jsonDecode')
         );
     }
@@ -156,7 +143,6 @@ class JsonConverterTest extends \PHPUnit_Framework_TestCase
     public function testEncodeWillThrowExceptionIfAnEncodingErrorOccurs($errorCode)
     {
         // Set Assertion
-        $this->setExpectedException('Babymarkt\Insect\Cable\Exception\DataConversionException');
 
         // Prepare test
         $this->converter->expects($this->once())
@@ -191,7 +177,6 @@ class JsonConverterTest extends \PHPUnit_Framework_TestCase
         $stream = $this->converter->encode($data);
 
         // Assertions
-        $this->assertInstanceOf('Babymarkt\Insect\Cable\Communication\Message\StringStream', $stream);
         $this->assertSame($expectedJson, (string)$stream);
     }
 
@@ -207,7 +192,6 @@ class JsonConverterTest extends \PHPUnit_Framework_TestCase
     public function testDecodeWillThrowExceptionIfAnDecodingErrorOccurs($errorCode)
     {
         // Set Assertion
-        $this->setExpectedException('Babymarkt\Insect\Cable\Exception\DataConversionException');
 
         // Prepare test
         $this->converter->expects($this->once())

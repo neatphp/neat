@@ -24,7 +24,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorWithMalformedUri()
     {
-        $this->setExpectedException('Babymarkt\Insect\Cable\Communication\Message\Exception\InvalidArgumentException');
+
         $this->subject = new Uri('http:///test.com"');
     }
 
@@ -34,7 +34,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
     public function testStringCasting()
     {
         $this->assertSame(
-            'http://user:password@wwww.test.com:80/path1/path2/path3?query1=value1&query2=value2&query3=value3#fragment',
+
             (string)$this->subject
         );
     }
@@ -120,7 +120,6 @@ class UriTest extends \PHPUnit_Framework_TestCase
      */
     public function testWithSchemeWithInvalidValue()
     {
-        $this->setExpectedException('Babymarkt\Insect\Cable\Communication\Message\Exception\InvalidArgumentException');
         $this->subject->withScheme(array());
     }
 
