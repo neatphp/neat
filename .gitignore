@@ -1,7 +1,5 @@
 /.idea
-/nbproject
 /report
 /vendor
 .DS_Store
 composer.lock
-/nbproject/private/
