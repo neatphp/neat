@@ -1,2 +1,2 @@
 # neat
-Neat PHP CQRS Event Sourcing Framework
+Neat PHP Action–domain–responder Framework
